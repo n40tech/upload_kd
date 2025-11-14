@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP Content Collector</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use Inter as the default font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* CSS to hide forms initially */
+        .hidden-form {
+            display: none;
+            opacity: 0;
+        }
+        .form-section {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        /* UPDATED: Styles for the instructions box */
+        .instructions {
+            background-color: #fefce8; /* Lighter yellow */
+            border: 1px solid #fde047; /* Yellow border */
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .instructions h3 {
+            font-weight: 600;
+            color: #854d0e; /* Darker yellow/brown */
+            margin-bottom: 8px;
+        }
+        .instructions ol {
+            list-style-type: decimal;
+            list-style-position: inside;
+            padding-left: 4px;
+            /* Use space-y utility class in HTML */
+        }
+        .instructions code {
+            background-color: #f3f4f6;
+            color: #be123c;
+            font-size: 0.875rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* Styles for loading and messages */
+        .message-box {
+            display: none;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        .message-box h4 {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .message-box.success {
+            background-color: #e6f7ec;
+            border: 1px solid #b7ebc9;
+            color: #0f5127;
+        }
+        .message-box.error {
+            background-color: #fdeaea;
+            border: 1px solid #f9c6c6;
+            color: #5d1111;
+        }
+        .message-box a {
+            color: #0056b3;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        /* Style for disabled buttons */
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Styles for "Clear" button on image inputs */
+        .clear-image-btn {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 500; /* medium */
+            padding: 0 0.75rem; /* px-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: background-color 0.2s;
+            height: 42px; /* Match input height */
+        }
+        .clear-image-btn:hover {
+            background-color: #dc2626; /* red-600 */
+        }
+
+        /* Custom styles for dynamic file input */
+        .custom-file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            flex: 1 1 0%;
+            min-width: 150px;
+            /* NEW: Drag-drop styles */
+            border: 2px dashed #d1d5db; /* gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.2s ease;
+        }
+        .custom-file-input.dragover {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .custom-file-input input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .custom-file-input-label {
+            /* Mimic Tailwind input */
+            display: block;
+            padding: 0.5rem; /* p-2 */
+            font-size: 0.875rem; /* text-sm */
+            color: #374151; /* gray-700 */
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-color: #ffffff;
+            height: 42px; /* Match text input height */
+            line-height: 2; /* Center text vertically */
+        }
+        .custom-file-input input[type="file"]:hover + .custom-file-input-label {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .custom-file-input.dragover .custom-file-input-label {
+             background-color: transparent;
+        }
+
+        /* Styles for static drag-drop zones */
+        .drop-zone-container {
+            border: 2px dashed #d1d5db; /* gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.2s ease;
+            padding: 0.5rem;
+            flex: 1;
+        }
+        .drop-zone-container.dragover {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .drop-zone-container input[type="file"] {
+            border: none;
+            padding: 0;
+            width: 100%;
+            /* Make file selector button match */
+            file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200;
+        }
+        .drop-zone-container.dragover input[type="file"] {
+            background-color: transparent;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+
+    <div class="container mx-auto max-w-2xl w-full">
+        <div class="bg-white rounded-lg shadow-2xl p-8 relative">
+            
+            <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800 mb-6">
+                WordPress Content Collector
+            </h1>
+
+            <!-- WP Details Form (Login Section) -->
+            <div id="login-section" class="space-y-4">
+                
+                <div id="instructions-box" class="instructions hidden">
+                    <h3>How to Get Your Application Password</h3>
+                    <ol class="space-y-1 text-sm text-gray-700">
+                        <li>Log in to your WordPress admin (e.g., <code>yoursite.com/wp-admin</code>).</li>
+                        <li>In the left-hand menu, go to <strong>Users</strong> > <strong>Profile</strong>.</li>
+                        <li>Scroll down to the "<strong>Application Passwords</strong>" section.</li>
+                        <li>In the "New Application Password Name" box, type a name (e.g., "Content Collector") and click "<strong>Add New Application Password</strong>".</li>
+                        <li>WordPress will generate a password like <code>xxxx xxxx xxxx xxxx</code>.</li>
+                        <li><strong>Copy this password</strong> (don't close the page until you do!) and paste it into the "Application Password" field below.</li>
+                    </ol>
+                </div>
+                
+                <div id="manual-login-box" class="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Login to WordPress</h2>
+                    <div class="hidden">
+                        <label for="wp-url" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Site URL</label>
+                        <input type="url" id="wp-url" placeholder="e.g., https://www.your-site.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="wp-user" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Username</label>
+                        <input type="text" id="wp-user" placeholder="Your admin username" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="wp-pass" class="block text-sm font-medium text-gray-600 mb-1">Your Application Password</label>
+                        <input type="password" id="wp-pass" placeholder="Paste the xxxx xxxx ... password here" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                    </div>
+                    <button id="login-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 text-sm">
+                        Login & Save Credentials
+                    </button>
+                    
+                    <div class="flex items-center pt-2 hidden">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    
+                    <div>
+                    </div>
+
+                    <!-- Login Status Feedback -->
+                    <p id="login-status-msg" class="text-xs text-center" style="display: none;"></p>
+                </div>
+            
+                <!-- Centered key-upload div -->
+                <div class="pt-4 hidden">
+                    <label for="key-upload" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 text-sm text-center cursor-pointer block">
+                        Upload key.txt
+                    </label>
+                    <input type="file" id="key-upload" class="hidden" accept=".txt,text/plain">
+                    <p id="key-upload-help-text" class="text-xs text-gray-500 text-center mt-2">
+                        (A .txt file with URL on line 1, Username on line 2, and Password on line 3)
+                    </p>
+                    <p id="key-upload-msg" class="text-xs text-center mt-2" style="display: none;"></p>
+                </div>
+            </div>
+            
+            <!-- Main Application Section (Hidden by default) -->
+            <div id="main-app-section" class="hidden">
+            
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm text-green-600">
+                        Logged in as: <span id="welcome-user" class="font-medium"></span>
+                    </p>
+                    <button id="logout-button" class="text-sm text-gray-500 hover:text-red-600 hover:underline">Logout</button>
+                </div>
+
+                <!-- Step 1: Template Selection -->
+                <div class="mb-6">
+                    <label for="template-select" class="block text-lg font-medium text-gray-700 mb-2">
+                        Select a Template
+                    </label>
+                    <select id="template-select" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Please choose an option --</option>
+                        <option value="media-link">Media (Link)</option>
+                        <option value="media-video">Media (Video)</option>
+                        <option value="work" id="option-work">Work</option>
+                        <option value="exhibition" id="option-exhibition">Exhibition</option>
+                    </select>
+                </div>
+
+                <!-- Step 2: Dynamic Forms Container -->
+                <div id="forms-container">
+                    
+                    <!-- Media (Link) Form -->
+                    <form id="media-link-form" class="form-section hidden-form space-y-4">
+                        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                            Media (Link) Details
+                        </h2>
+                        
+                        <div>
+                            <label for="link-url" class="block text-sm font-medium text-gray-600 mb-1">Link URL <span class="text-red-500">*</span></label>
+                            <input type="url" id="link-url" placeholder="e.g., https://www.example.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="link-title" class="block text-sm font-medium text-gray-600 mb-1">Link Title <span class="text-red-500">*</span></label>
+                            <!-- UPDATED: Removed "Check" button -->
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="link-title" placeholder="e.g., Article about..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                            </div>
+                            <p id="link-title-status" class="text-xs mt-1"></p>
+                        </div>
+                        <div>
+                            <label for="link-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                            <textarea id="link-description" rows="3" placeholder="Short description of the link." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="link-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
+                            <select id="link-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
+                                <option value="">-- Select Category --</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="link-year" class="block text-sm font-medium text-gray-600 mb-1">Year (for tagging)</label>
+                            <input type="number" id="link-year" placeholder="YYYY" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="link-body-of-work" class="block text-sm font-medium text-gray-600 mb-1">Body of Work (for tagging) (Optional)</label>
+                            <input type="text" id="link-body-of-work" placeholder="e.g., Project Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" data-default-text="Create 'Media (Link)' Post" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                            Create "Media (Link)" Post
+                        </button>
+                    </form>
+
+                    <!-- Media (Video) Form -->
+                    <form id="media-video-form" class="form-section hidden-form space-y-4">
+                        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                            Media (Video) Details
+                        </h2>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Video Source</label>
+                            <div class="flex gap-4" id="video-source-radios">
+                                <label class="flex items-center">
+                                    <input type="radio" name="video-source" value="url" class="form-radio" checked>
+                                    <span class="ml-2">URL</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="video-source" value="upload" class="form-radio">
+                                    <span class="ml-2">Upload</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="video-source-url-group">
+                            <label for="video-url" class="block text-sm font-medium text-gray-600 mb-1">Video URL (YouTube, Vimeo, etc.) <span id="video-url-required" class="text-red-500">*</span></label>
+                            <input type="url" id="video-url" placeholder="e.g., https://www.youtube.com/watch?v=..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+
+                        <div id="video-source-upload-group" class="hidden space-y-2">
+                            <label for="video-file-upload" class="block text-sm font-medium text-gray-600 mb-1">Video File <span id="video-upload-required" class="text-red-500 hidden">*</span></label>
+                            <div class="flex gap-2 items-center">
+                                <div class="drop-zone-container">
+                                    <input type="file" id="video-file-upload" accept="video/*">
+                                </div>
+                                <button type="button" id="video-file-upload-clear" class="clear-image-btn">Clear</button>
+                            </div>
+                            <div id="video-file-upload-preview" class="mt-2 text-sm text-gray-600"></div>
+                        </div>
+
+                        <div>
+                            <label for="video-title" class="block text-sm font-medium text-gray-600 mb-1">Video Title <span class="text-red-500">*</span></label>
+                            <!-- UPDATED: Removed "Check" button -->
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="video-title" placeholder="e.g., Interview with..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                            </div>
+                            <p id="video-title-status" class="text-xs mt-1"></p>
+                        </div>
+                        <div>
+                            <label for="video-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                            <textarea id="video-description" rows="3" placeholder="Short description of the video." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="video-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
+                            <select id="video-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
+                                <option value="">-- Select Category --</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="video-year" class="block text-sm font-medium text-gray-600 mb-1">Year (for tagging)</label>
+                            <input type="number" id="video-year" placeholder="YYYY" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="video-body-of-work" class="block text-sm font-medium text-gray-600 mb-1">Body of Work (for tagging) (Optional)</label>
+                            <input type="text" id="video-body-of-work" placeholder="e.g., Project Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" data-default-text="Create 'Media (Video)' Post" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                            Create "Media (Video)" Post
+                        </button>
+                    </form>
+                    
+                    <form id="portfolio-form" class="form-section hidden-form space-y-4">
+                        <h2 id="portfolio-form-title" class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                            Work Details
+                        </h2>
+                        <div>
+                            <label for="portfolio-title" class="block text-sm font-medium text-gray-600 mb-1">Title <span class="text-red-500">*</span></label>
+                            <!-- UPDATED: Removed "Check" button -->
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="portfolio-title" placeholder="e.g., My New Sculpture" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                            </div>
+                            <p id="portfolio-title-status" class="text-xs mt-1"></p>
+                        </div>
+                        <div>
+                            <label for="portfolio-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                            <textarea id="portfolio-description" rows="4" placeholder="Description of the work..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="portfolio-tags" class="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated: year, mediums, bodies of work)</label>
+                            <input type="text" id="portfolio-tags" placeholder="e.g., 2024, sculpture, bronze, Project Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            <!-- NEW: Tag status area -->
+                            <div id="portfolio-tags-status" class="text-xs mt-1 leading-snug"></div>
+                        </div>
+
+                        <!-- Exhibition-only fields -->
+                        <div class="exhibition-only hidden">
+                            <label for="portfolio-gallery" class="block text-sm font-medium text-gray-600 mb-1">Gallery</label>
+                            <input type="text" id="portfolio-gallery" placeholder="e.g., Gallery Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 exhibition-only hidden">
+                            <div>
+                                <label for="portfolio-start-date" class="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
+                                <input type="date" id="portfolio-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="portfolio-end-date" class="block text-sm font-medium text-gray-600 mb-1">End Date</label>
+                                <input type="date" id="portfolio-end-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="portfolio-featured-image" class="block text-sm font-medium text-gray-600 mb-1">Featured Image</label>
+                            <div class="flex gap-2 items-center">
+                                <div class="drop-zone-container">
+                                    <input type="file" id="portfolio-featured-image" accept="image/*">
+                                </div>
+                                <button type="button" id="portfolio-featured-image-clear" class="clear-image-btn">Clear</button>
+                            </div>
+                            <div id="portfolio-featured-image-preview" class="mt-2"></div>
+                        </div>
+                        
+                        <!-- UPDATED: Hover Image field completely REMOVED -->
+
+                        <div>
+                            <label for="portfolio-all-images" class="block text-sm font-medium text-gray-600 mb-1">Gallery (multi-select)</label>
+                            <div class="flex gap-2 items-center">
+                                <div class="drop-zone-container">
+                                    <input type="file" id="portfolio-all-images" multiple accept="image/*">
+                                </div>
+                                <button type="button" id="portfolio-all-images-clear" class="clear-image-btn">Clear</button>
+                            </div>
+                            <!-- NEW: Gallery helper text -->
+                            <p class="text-xs text-gray-500 mt-1">Note: Images will be uploaded, but you must select them in the WordPress editor's gallery block.</p>
+                            <div id="portfolio-all-images-preview" class="mt-2 grid grid-cols-3 gap-2"></div>
+                        </div>
+
+                        <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Files</h3>
+                            <div id="portfolio-files-container" class="space-y-2">
+                                <!-- Dynamic rows added here -->
+                            </div>
+                            <button type="button" id="portfolio-add-file-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add File</button>
+                        </div>
+                        <div class="border-t pt-4">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Links</h3>
+                            <div id="portfolio-links-container" class="space-y-2">
+                                <!-- Dynamic rows added here -->
+                            </div>
+                            <button type="button" id="portfolio-add-link-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Link</button>
+                        </div>
+                        <button type="submit" id="portfolio-submit-button" data-default-text="Create 'Work' Post" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
+                            Create "Work" Post
+                        </button>
+                    </form>
+
+                </div>
+
+                <!-- Step 3: Status / Output Section -->
+                <div id="output-section" class="mt-8 hidden-form">
+
+                    <div id="loading-progress-container" class="w-full bg-gray-200 rounded-full h-2.5 mb-2" style="display: none;">
+                        <div id="loading-progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="loading-progress-text" class="text-center text-sm text-gray-600 mb-4" style="display: none;"></p>
+                    
+                    <div id="message-success" class="message-box success">
+                        <h4>Success! Post Created.</h4>
+                        <p id="success-text"></p>
+                        <p class="mt-2">
+                            <a id="edit-link" href="#" target="_blank">Edit Draft</a> | 
+                            <a id="view-link" href="#" target="_blank">Preview Post</a>
+                        </p>
+                    </div>
+                    
+                    <div id="message-error" class="message-box error">
+                        <h4>Error</h4>
+                        <p>There was a problem creating your post.</p>
+                        <pre id="error-text" class="text-xs mt-2 p-2 bg-gray-700 text-red-300 rounded overflow-auto"></pre>
+                    </div>
+                    
+                </div>
+            </div> <!-- End Main App Section -->
+        </div>
+    </div>
+
+    <script>
+        // === LocalStorage Helper Functions ===
+        function setStorage(name, value) {
+            try {
+                localStorage.setItem(name, value || "");
+            } catch (e) {
+                console.error("LocalStorage write failed:", e);
+            }
+        }
+
+        function getStorage(name) {
+            try {
+                return localStorage.getItem(name);
+            } catch (e) {
+                console.error("LocalStorage read failed:", e);
+                return null;
+            }
+        }
+
+        function eraseStorage(name) {
+             try {
+                localStorage.removeItem(name);
+            } catch (e) {
+                console.error("LocalStorage remove failed:", e);
+            }
+        }
+
+        // === Get all the elements we need ===
+        const loginSection = document.getElementById('login-section');
+        const mainAppSection = document.getElementById('main-app-section');
+        
+        const templateSelect = document.getElementById('template-select');
+        const formsContainer = document.getElementById('forms-container');
+        const mediaLinkForm = document.getElementById('media-link-form');
+        const mediaVideoForm = document.getElementById('media-video-form');
+        const portfolioForm = document.getElementById('portfolio-form'); 
+        
+        const outputSection = document.getElementById('output-section');
+
+        // WP Creds Elements
+        const wpUrl = document.getElementById('wp-url');
+        const wpUser = document.getElementById('wp-user');
+        const wpPass = document.getElementById('wp-pass');
+        const loginButton = document.getElementById('login-button');
+
+        // Key Upload Elements
+        // const keyUpload = document.getElementById('key-upload'); // REMOVED
+        // const keyUploadMsg = document.getElementById('key-upload-msg'); // REMOVED
+
+        // Category Fetch Elements
+        const loginStatusMsg = document.getElementById('login-status-msg');
+        const linkCategorySelect = document.getElementById('link-post-category');
+        const videoCategorySelect = document.getElementById('video-post-category');
+
+        // Status Elements
+        const messageSuccess = document.getElementById('message-success');
+        const messageError = document.getElementById('message-error');
+        const successText = document.getElementById('success-text');
+        const errorText = document.getElementById('error-text');
+        const editLink = document.getElementById('edit-link');
+        const viewLink = document.getElementById('view-link');
+        
+        // Progress Bar Elements
+        const loadingProgressContainer = document.getElementById('loading-progress-container');
+        const loadingProgressBar = document.getElementById('loading-progress-bar');
+        const loadingProgressText = document.getElementById('loading-progress-text');
+        
+        // App State Elements
+        const welcomeUser = document.getElementById('welcome-user');
+        const logoutButton = document.getElementById('logout-button');
+        
+        // Store all forms in an object for easy access
+        const forms = {
+            'media-link': mediaLinkForm,
+            'media-video': mediaVideoForm,
+            'work': portfolioForm,
+            'exhibition': portfolioForm
+        };
+ 
+        const autoSaveKey = 'wpCollectorDraft';
+        
+        // NEW: Global var for tags
+        window.wpPortfolioTags = [];
+
+        // === App State Functions ===
+        function showLoginScreen(message = '', type = 'error') {
+            loginSection.classList.remove('hidden');
+            mainAppSection.classList.add('hidden');
+            
+            eraseStorage('wpCollectorUrl');
+            eraseStorage('wpCollectorUser');
+            eraseStorage('wpCollectorPass');
+
+            wpUrl.value = 'https://katedaudy.com'; // SET IT HERE
+            wpUser.value = '';
+            wpPass.value = '';
+            
+            if (message) {
+                loginStatusMsg.style.display = 'block';
+                loginStatusMsg.className = type === 'error' ? 'text-xs text-red-600 text-center' : 'text-xs text-gray-500 text-center';
+                loginStatusMsg.textContent = message;
+            }
+        }
+
+        function showMainApp() {
+            loginSection.classList.add('hidden');
+            mainAppSection.classList.remove('hidden');
+            welcomeUser.textContent = getStorage('wpCollectorUser');
+            loadFormData();
+        }
+
+        // === Event Listeners ===
+
+        loginButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await fetchCategories();
+        });
+        
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            eraseStorage(autoSaveKey);
+            showLoginScreen('You have been logged out.', 'success');
+        });
+
+        window.addEventListener('load', async () => {
+            wpUrl.value = 'https://katedaudy.com'; // SET THE VALUE
+            const storedUser = getStorage('wpCollectorUser');
+            const storedPass = getStorage('wpCollectorPass');
+            
+            if (storedUser) wpUser.value = storedUser;
+            if (storedPass) wpPass.value = storedPass;
+
+            if (storedUser && storedPass) { // UPDATED CHECK
+                await fetchCategories();
+            }
+        });
+
+        // function showKeyUploadMessage(message, type) { // REMOVED
+        //     keyUploadMsg.textContent = message;
+        //     keyUploadMsg.className = type === 'error' 
+        //         ? 'text-xs text-red-600 text-center mt-2' 
+        //         : 'text-xs text-green-600 text-center mt-2';
+        //     keyUploadMsg.style.display = 'block';
+            
+        //     setTimeout(() => {
+        //         keyUploadMsg.style.display = 'none';
+        //     }, 5000);
+        // }
+
+        // keyUpload.addEventListener('change', (e) => { // REMOVED
+        //     const file = e.target.files[0];
+        //     if (!file) return;
+            
+        //     if (file.type !== 'text/plain') {
+        //         showKeyUploadMessage('Error: Please upload a .txt file.', 'error');
+        //         e.target.value = null;
+        //         return;
+        //     }
+
+        //     const reader = new FileReader();
+            
+        //     reader.onload = async (event) => {
+        //         try {
+        //             const content = event.target.result;
+        //             const lines = content.split(/\r?\n/);
+                    
+        //             if (lines.length < 3) {
+        //                 throw new Error('File must contain at least 3 lines: URL, Username, and Password.');
+        //             }
+                    
+        //             const fileUrl = lines[0].trim();
+        //             const fileUser = lines[1].trim();
+        //             const filePass = lines[2].trim();
+                    
+        //             if (!fileUrl || !fileUser || !filePass) {
+        //                  throw new Error('File has empty lines. Ensure URL, Username, and Password are on the first 3 lines.');
+        //             }
+
+        //             // wpUrl.value = fileUrl; // REMOVED
+        //             wpUser.value = fileUser;
+        //             wpPass.value = filePass;
+                    
+        //             await fetchCategories();
+                    
+        //             if (!mainAppSection.classList.contains('hidden')) {
+        //                 showKeyUploadMessage('Success! Credentials loaded & logged in.', 'success');
+        //             } else {
+        //                 showKeyUploadMessage('Key file loaded, but login failed. Check credentials.', 'error');
+        //             }
+                
+        //         } catch (error) {
+        //             console.error('Error reading key file:', error);
+        //             showKeyUploadMessage(error.message, 'error');
+        //         } finally {
+        //             e.target.value = null; 
+        //         }
+        //     };
+            
+        //     reader.onerror = () => {
+        //          showKeyUploadMessage('Error reading file.', 'error');
+        //          e.target.value = null;
+        //     };
+
+        //     reader.readAsText(file);
+        // });
+
+        async function fetchCategories() {
+            loginStatusMsg.style.display = 'block';
+            loginStatusMsg.className = 'text-xs text-gray-500 text-center';
+            loginStatusMsg.textContent = 'Logging in & fetching categories...';
+            
+            loginButton.disabled = true;
+            loginButton.textContent = 'Logging in...';
+
+            let siteUrl, username, password, basicAuth, apiUrl;
+
+            try {
+                siteUrl = ensureHttps(wpUrl.value).replace(/\/+$/, '');
+                username = wpUser.value;
+                password = wpPass.value;
+
+                if (!siteUrl || !username || !password) {
+                    throw new Error('Please fill in URL, Username, and Password first.');
+                }
+
+                apiUrl = `${siteUrl}/wp-json/wp/v2/categories`;
+                basicAuth = 'Basic ' + btoa(username + ':' + password);
+
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': basicAuth }
+                });
+
+                const categories = await response.json();
+
+                if (!response.ok) {
+                    throw categories; // Throw WP error object
+                }
+                
+                setStorage('wpCollectorUrl', siteUrl);
+                setStorage('wpCollectorUser', username);
+                setStorage('wpCollectorPass', password);
+                
+                populateCategoryDropdowns(categories);
+                
+                // NEW: Fetch portfolio tags
+                try {
+                    const tagsApiUrl = `${siteUrl}/wp-json/wp/v2/portfolio-tags?per_page=100`;
+                    const tagsResponse = await fetch(tagsApiUrl, { headers: { 'Authorization': basicAuth } });
+                    const tags = await tagsResponse.json();
+                    if (tagsResponse.ok) {
+                        window.wpPortfolioTags = tags.map(tag => tag.name.toLowerCase());
+                    } else {
+                        console.warn('Could not fetch portfolio tags.');
+                        window.wpPortfolioTags = [];
+                    }
+                } catch (tagError) {
+                    console.warn('Portfolio tags fetch failed:', tagError);
+                    window.wpPortfolioTags = [];
+                }
+
+                showMainApp(); // This will now call loadFormData()
+                
+                loginStatusMsg.textContent = 'Success! Logged in & categories fetched!';
+                loginStatusMsg.className = 'text-xs text-green-600 text-center';
+                
+                setTimeout(() => {
+                    loginStatusMsg.style.display = 'none';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                let errorMessage = 'Could not fetch categories. Check credentials/URL.';
+                
+                if (error && error.message) { 
+                    errorMessage = error.message;
+                } else if (error instanceof Error) {
+                    errorMessage = error.message;
+                }
+                
+                showLoginScreen(errorMessage);
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'Login & Save Credentials';
+            }
+        }
+
+        function populateCategoryDropdowns(categories) {
+            const dropdowns = [linkCategorySelect, videoCategorySelect];
+            
+            dropdowns.forEach(dropdown => {
+                while (dropdown.options.length > 1) {
+                    dropdown.remove(1);
+                }
+                categories.forEach(category => {
+                    if (category.slug === 'uncategorized') return; 
+                    const option = document.createElement('option');
+                    option.value = category.slug;
+                    option.textContent = category.name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        function ensureHttps(url) {
+            const trimmedUrl = url.trim();
+            if (trimmedUrl === '') return '';
+            if (!/^(https?:\/\/)/i.test(trimmedUrl)) {
+                return 'https://' + trimmedUrl;
+            }
+            return trimmedUrl;
+        }
+
+        async function uploadMediaToWordPress(file, siteUrl, basicAuth) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch(`${siteUrl}/wp-json/wp/v2/media`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': basicAuth
+                },
+                body: formData
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to upload media');
+            }
+            
+            return await response.json();
+        }
+
+        function setupImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            if (!input || !preview) return;
+            
+            input.addEventListener('change', (e) => {
+                preview.innerHTML = '';
+                const files = e.target.files;
+                
+                if (files.length === 0) return;
+                
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const img = document.createElement('img');
+                            img.src = event.target.result;
+                            img.className = 'w-full h-24 object-cover rounded';
+                            preview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+        
+        function setupFilePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            if (!input || !preview) return;
+            
+            input.addEventListener('change', (e) => {
+                preview.innerHTML = '';
+                const files = e.target.files;
+                if (files.length > 0) {
+                    preview.textContent = `Selected file: ${files[0].name}`;
+                }
+            });
+        }
+
+
+        function setupImageClearButton(buttonId, inputId, previewId) {
+            const clearBtn = document.getElementById(buttonId);
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            if (!clearBtn || !input || !preview) return;
+            
+            clearBtn.addEventListener('click', () => {
+                input.value = null; // Clear the file input
+                preview.innerHTML = ''; // Clear the preview
+            });
+        }
+
+        function setupDragAndDrop(zoneElement) {
+            const input = zoneElement.querySelector('input[type="file"]');
+            if (!zoneElement || !input) return;
+
+            zoneElement.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zoneElement.classList.add('dragover');
+            });
+
+            zoneElement.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                zoneElement.classList.remove('dragover');
+            });
+
+            zoneElement.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zoneElement.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    input.files = e.dataTransfer.files;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        function setupDynamicDragAndDrop(dropZone, fileInput) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileInput.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        function setupAddRemoveButtons(prefix) {
+            const addFileBtn = document.getElementById(`${prefix}-add-file-btn`);
+            const addLinkBtn = document.getElementById(`${prefix}-add-link-btn`);
+            const filesContainer = document.getElementById(`${prefix}-files-container`);
+            const linksContainer = document.getElementById(`${prefix}-links-container`);
+            
+            if (addFileBtn && filesContainer) {
+                addFileBtn.addEventListener('click', () => {
+                    const row = document.createElement('div');
+                    row.className = 'flex flex-wrap md:flex-nowrap gap-2 items-center';
+                    row.innerHTML = `
+                        <input type="text" placeholder="File title" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 min-w-[100px]">
+                        <div class="custom-file-input">
+                            <input type="file" class="file-input-dynamic">
+                            <span class="custom-file-input-label">Choose file... (or drag here)</span>
+                        </div>
+                        <button type="button" class="remove-file-btn bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600">Remove</button>
+                    `;
+                    filesContainer.appendChild(row);
+
+                    const fileInput = row.querySelector('.file-input-dynamic');
+                    const fileLabel = row.querySelector('.custom-file-input-label');
+                    fileInput.addEventListener('change', () => {
+                        fileLabel.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'Choose file... (or drag here)';
+                    });
+
+                    const dropZone = row.querySelector('.custom-file-input');
+                    setupDynamicDragAndDrop(dropZone, fileInput);
+
+                    row.querySelector('.remove-file-btn').addEventListener('click', () => row.remove());
+                });
+            }
+            
+            if (addLinkBtn && linksContainer) {
+                addLinkBtn.addEventListener('click', () => {
+                    const row = document.createElement('div');
+                    row.className = 'flex flex-wrap md:flex-nowrap gap-2';
+                    row.innerHTML = `
+                        <input type="text" placeholder="Link title" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 min-w-[100px]">
+                        <input type="url" placeholder="Link URL" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 min-w-[150px]">
+                        <button type="button" class="remove-link-btn bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600">Remove</button>
+                    `;
+                    linksContainer.appendChild(row);
+                    row.querySelector('.remove-link-btn').addEventListener('click', () => row.remove());
+
+                    const newUrlInput = row.querySelector('input[type="url"]');
+                    if (newUrlInput) {
+                        newUrlInput.addEventListener('blur', (e) => {
+                            e.target.value = ensureHttps(e.target.value);
+                        });
+                    }
+                    
+                    row.querySelectorAll('input').forEach(input => {
+                        input.addEventListener('input', saveFormData);
+                    });
+                });
+                
+                linksContainer.querySelectorAll('input[type="url"]').forEach(urlInput => {
+                    urlInput.addEventListener('blur', (e) => {
+                        e.target.value = ensureHttps(e.target.value);
+                    });
+                });
+            }
+        }
+
+        // === Auto-Save Functions ===
+        function saveFormData() {
+            if (mainAppSection.classList.contains('hidden')) return;
+ 
+            const formData = {
+                template: templateSelect.value,
+                // Media (Link)
+                linkUrl: document.getElementById('link-url').value,
+                linkTitle: document.getElementById('link-title').value,
+                linkDesc: document.getElementById('link-description').value,
+                linkCat: document.getElementById('link-post-category').value,
+                linkYear: document.getElementById('link-year').value,
+                linkBody: document.getElementById('link-body-of-work').value,
+                // Media (Video)
+                videoUrl: document.getElementById('video-url').value,
+                videoTitle: document.getElementById('video-title').value,
+                videoDesc: document.getElementById('video-description').value,
+                videoCat: document.getElementById('video-post-category').value,
+                videoYear: document.getElementById('video-year').value,
+                videoBody: document.getElementById('video-body-of-work').value,
+                videoSource: document.querySelector('input[name="video-source"]:checked').value,
+                // Merged portfolio fields
+                portfolioTitle: document.getElementById('portfolio-title').value,
+                portfolioDesc: document.getElementById('portfolio-description').value,
+                portfolioTags: document.getElementById('portfolio-tags').value,
+                portfolioGallery: document.getElementById('portfolio-gallery').value,
+                portfolioStart: document.getElementById('portfolio-start-date').value,
+                portfolioEnd: document.getElementById('portfolio-end-date').value,
+                portfolioLinks: [], 
+                portfolioFiles: [],
+            };
+
+            document.querySelectorAll('#portfolio-files-container .flex').forEach(row => {
+                const titleInput = row.querySelector('input[type="text"]');
+                if (titleInput) {
+                    formData.portfolioFiles.push({ title: titleInput.value });
+                }
+            });
+            document.querySelectorAll('#portfolio-links-container .flex').forEach(row => {
+                const titleInput = row.querySelector('input[type="text"]');
+                const urlInput = row.querySelector('input[type="url"]');
+                if (titleInput && urlInput) {
+                    formData.portfolioLinks.push({ title: titleInput.value, url: urlInput.value });
+                }
+            });
+
+            localStorage.setItem(autoSaveKey, JSON.stringify(formData));
+        }
+
+        function loadFormData() {
+            const savedData = localStorage.getItem(autoSaveKey);
+            if (!savedData) return;
+
+            try {
+                const data = JSON.parse(savedData);
+                
+                document.getElementById('link-url').value = data.linkUrl || '';
+                document.getElementById('link-title').value = data.linkTitle || '';
+                document.getElementById('link-description').value = data.linkDesc || '';
+                document.getElementById('link-post-category').value = data.linkCat || '';
+                document.getElementById('link-year').value = data.linkYear || '';
+                document.getElementById('link-body-of-work').value = data.linkBody || '';
+                
+                document.getElementById('video-url').value = data.videoUrl || '';
+                document.getElementById('video-title').value = data.videoTitle || '';
+                document.getElementById('video-description').value = data.videoDesc || '';
+                document.getElementById('video-post-category').value = data.videoCat || '';
+                document.getElementById('video-year').value = data.videoYear || '';
+                document.getElementById('video-body-of-work').value = data.videoBody || '';
+                if(data.videoSource) {
+                    const radio = document.querySelector(`input[name="video-source"][value="${data.videoSource}"]`);
+                    if(radio) radio.click(); 
+                }
+
+                document.getElementById('portfolio-title').value = data.portfolioTitle || '';
+                document.getElementById('portfolio-description').value = data.portfolioDesc || '';
+                document.getElementById('portfolio-tags').value = data.portfolioTags || '';
+                document.getElementById('portfolio-gallery').value = data.portfolioGallery || '';
+                document.getElementById('portfolio-start-date').value = data.portfolioStart || '';
+                document.getElementById('portfolio-end-date').value = data.portfolioEnd || '';
+
+                const portfolioAddFileBtn = document.getElementById('portfolio-add-file-btn');
+                if (data.portfolioFiles && portfolioAddFileBtn) {
+                    data.portfolioFiles.forEach(file => {
+                        if (file && file.title) {
+                            portfolioAddFileBtn.click();
+                            const newRow = document.querySelector('#portfolio-files-container .flex:last-child');
+                            if (newRow) {
+                                newRow.querySelector('input[type="text"]').value = file.title || '';
+                            }
+                        }
+                    });
+                }
+                const portfolioAddLinkBtn = document.getElementById('portfolio-add-link-btn');
+                if (data.portfolioLinks && portfolioAddLinkBtn) {
+                    data.portfolioLinks.forEach(link => {
+                        if (link && (link.title || link.url)) {
+                            portfolioAddLinkBtn.click(); 
+                            const newRow = document.querySelector('#portfolio-links-container .flex:last-child');
+                            if (newRow) {
+                                newRow.querySelector('input[type="text"]').value = link.title || '';
+                                newRow.querySelector('input[type="url"]').value = link.url || '';
+                            }
+                        }
+                    });
+                }
+                
+                // NEW: Trigger tag check on load
+                if (data.portfolioTags) {
+                    checkPortfolioTags(data.portfolioTags);
+                }
+
+                if (data.template) {
+                    templateSelect.value = data.template;
+                    templateSelect.dispatchEvent(new Event('change'));
+                }
+
+            } catch (e) {
+                console.error('Failed to load auto-saved data:', e);
+                localStorage.removeItem(autoSaveKey);
+            }
+        }
+
+        // === Duplicate Title Check ===
+        async function checkDuplicateTitle(title, postType, statusElementId) {
+            const statusEl = document.getElementById(statusElementId);
+            if (!title) {
+                statusEl.textContent = '';
+                return;
+            }
+            
+            statusEl.textContent = 'Checking...';
+            statusEl.className = 'text-xs mt-1 text-gray-500';
+
+            try {
+                const siteUrl = getStorage('wpCollectorUrl').replace(/\/+$/, '');
+                const basicAuth = 'Basic ' + btoa(getStorage('wpCollectorUser') + ':' + getStorage('wpCollectorPass'));
+                
+                const apiUrl = `${siteUrl}/wp-json/wp/v2/${postType}?search=${encodeURIComponent(title)}&status=publish,draft,pending,future,private`;
+                
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': basicAuth }
+                });
+
+                if (!response.ok) throw new Error('API request failed');
+                
+                const results = await response.json();
+                
+                const exactMatch = results.find(post => 
+                    post.title && post.title.rendered && 
+                    post.title.rendered.toLowerCase() === title.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                    statusEl.textContent = 'Warning: A post with this exact title already exists.';
+                    statusEl.className = 'text-xs mt-1 text-yellow-600';
+                } else if (results.length > 0) {
+                    statusEl.textContent = 'Note: Similar titles exist, but no exact match found.';
+                    statusEl.className = 'text-xs mt-1 text-blue-600';
+                } else {
+                    statusEl.textContent = 'Title appears to be unique.';
+                    statusEl.className = 'text-xs mt-1 text-green-600';
+                }
+            } catch (error) {
+                console.error('Duplicate check failed:', error);
+                statusEl.textContent = 'Could not check title.';
+                statusEl.className = 'text-xs mt-1 text-red-600';
+            }
+        }
+        
+        // NEW: Portfolio Tag Check
+        function checkPortfolioTags(tagsInput) {
+            const statusEl = document.getElementById('portfolio-tags-status');
+            if (!window.wpPortfolioTags || !statusEl) return;
+
+            const existingTags = window.wpPortfolioTags;
+            const currentTags = tagsInput.split(',')
+                .map(t => t.trim().toLowerCase())
+                .filter(t => t);
+
+            if (currentTags.length === 0) {
+                statusEl.innerHTML = '';
+                return;
+            }
+
+            const newTags = [];
+            const matchedTags = [];
+
+            currentTags.forEach(tag => {
+                // Check for case-insensitive match
+                const found = existingTags.find(existing => existing === tag);
+                if (found) {
+                    matchedTags.push(tag);
+                } else {
+                    newTags.push(tag);
+                }
+            });
+
+            let html = '';
+            if (matchedTags.length > 0) {
+                // Use `&#8226;` for a bullet point
+                html += `<div><span class="font-medium text-green-700">Existing:</span> ${matchedTags.join(', ')}</div>`;
+            }
+            if (newTags.length > 0) {
+                html += `<div><span class="font-medium text-blue-700">New:</span> ${newTags.join(', ')}</div>`;
+            }
+            statusEl.innerHTML = html;
+        }
+
+        
+        function setupVideoFormToggle() {
+            const radios = document.querySelectorAll('input[name="video-source"]');
+            const urlGroup = document.getElementById('video-source-url-group');
+            const uploadGroup = document.getElementById('video-source-upload-group');
+            const urlRequired = document.getElementById('video-url-required');
+            const uploadRequired = document.getElementById('video-upload-required');
+
+            function toggle(value) {
+                if (value === 'url') {
+                    urlGroup.classList.remove('hidden');
+                    uploadGroup.classList.add('hidden');
+                    urlRequired.classList.remove('hidden');
+                    uploadRequired.classList.add('hidden');
+                } else {
+                    urlGroup.classList.add('hidden');
+                    uploadGroup.classList.remove('hidden');
+                    urlRequired.classList.add('hidden');
+                    uploadRequired.classList.remove('hidden');
+                }
+            }
+
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    toggle(e.target.value);
+                });
+            });
+            toggle(document.querySelector('input[name="video-source"]:checked').value);
+        }
+
+        // === Initialize Event Listeners on Page Load ===
+        window.addEventListener('load', () => {
+            // Setup Image Previews
+            setupImagePreview('portfolio-all-images', 'portfolio-all-images-preview');
+            setupImagePreview('portfolio-featured-image', 'portfolio-featured-image-preview');
+            setupFilePreview('video-file-upload', 'video-file-upload-preview'); 
+            
+            // Setup Clear Buttons
+            setupImageClearButton('portfolio-featured-image-clear', 'portfolio-featured-image', 'portfolio-featured-image-preview');
+            // UPDATED: Removed hover image clear button
+            setupImageClearButton('portfolio-all-images-clear', 'portfolio-all-images', 'portfolio-all-images-preview');
+            setupImageClearButton('video-file-upload-clear', 'video-file-upload', 'video-file-upload-preview'); 
+
+            // Setup Add/Remove buttons for dynamic rows
+            setupAddRemoveButtons('portfolio');
+
+            // Setup Drag-and-Drop for static inputs
+            document.querySelectorAll('.drop-zone-container').forEach(setupDragAndDrop);
+            
+            setupVideoFormToggle();
+
+            // Add auto-https to static URL fields
+            const urlFields = [
+                document.getElementById('wp-url'),
+                document.getElementById('link-url'),
+                document.getElementById('video-url')
+            ];
+            
+            urlFields.forEach(field => {
+                if (field) {
+                    field.addEventListener('blur', (e) => {
+                        e.target.value = ensureHttps(e.target.value);
+                    });
+                }
+            });
+            
+            // Setup Auto-Save listeners
+            mainAppSection.querySelectorAll('input, textarea, select').forEach(el => {
+                const eventType = (el.tagName === 'SELECT' || el.type === 'date' || el.type === 'radio') ? 'change' : 'input';
+                el.addEventListener(eventType, saveFormData);
+            });
+            
+            // Setup Duplicate Check listeners (on blur)
+            document.getElementById('link-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.target.value, 'posts', 'link-title-status');
+            });
+            document.getElementById('video-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.target.value, 'posts', 'video-title-status');
+            });
+             document.getElementById('portfolio-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.target.value, 'portfolio', 'portfolio-title-status');
+            });
+            
+            // NEW: Setup Tag Check listener
+            document.getElementById('portfolio-tags').addEventListener('input', (e) => {
+                checkPortfolioTags(e.target.value);
+            });
+        });
+
+
+        // --- Event Listener for Template Dropdown ---
+        templateSelect.addEventListener('change', (event) => {
+            const selectedValue = event.target.value;
+            
+            Object.values(forms).forEach(form => {
+                form.classList.add('hidden-form');
+                form.style.opacity = 0;
+            });
+            
+            hideOutput();
+
+            if (forms[selectedValue]) {
+                const formToShow = forms[selectedValue];
+                
+                if (selectedValue === 'work' || selectedValue === 'exhibition') {
+                    const submitButton = document.getElementById('portfolio-submit-button');
+                    const formTitle = document.getElementById('portfolio-form-title');
+                    const exhibitionFields = document.querySelectorAll('.exhibition-only');
+                    
+                    const titleText = selectedValue === 'work' ? 'Work' : 'Exhibition';
+                    
+                    formTitle.textContent = `${titleText} Details`;
+                    submitButton.textContent = `Create '${titleText}' Post`;
+                    submitButton.dataset.defaultText = `Create '${titleText}' Post`;
+                    
+                    if (selectedValue === 'exhibition') {
+                        submitButton.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                        submitButton.classList.add('bg-teal-600', 'hover:bg-teal-700');
+                        exhibitionFields.forEach(field => field.classList.remove('hidden'));
+                    } else {
+                        submitButton.classList.remove('bg-teal-600', 'hover:bg-teal-700');
+                        submitButton.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                        exhibitionFields.forEach(field => field.classList.add('hidden'));
+                    }
+                }
+                
+                formToShow.classList.remove('hidden-form');
+                setTimeout(() => {
+                    formToShow.style.opacity = 1;
+                }, 10);
+            }
+        });
+        
+        function hideOutput() {
+            outputSection.classList.add('hidden-form');
+            messageSuccess.style.display = 'none';
+            messageError.style.display = 'none';
+            loadingProgressContainer.style.display = 'none';
+            loadingProgressText.style.display = 'none';
+        }
+
+        function showError(message) {
+            loadingProgressContainer.style.display = 'none';
+            loadingProgressText.style.display = 'none';
+            messageError.style.display = 'block';
+            messageSuccess.style.display = 'none';
+            errorText.textContent = message;
+        }
+
+        function updateProgress(uploaded, total, message) {
+            loadingProgressText.textContent = message;
+            if (total === 0) {
+                loadingProgressBar.style.width = '100%';
+                return;
+            }
+            const percent = Math.round((uploaded / total) * 100);
+            loadingProgressBar.style.width = percent + '%';
+        }
+
+        // --- Function to handle form submission and POST to WordPress ---
+        async function handleFormSubmit(event, templateType) {
+            event.preventDefault(); 
+            
+            outputSection.classList.remove('hidden-form');
+            loadingProgressContainer.style.display = 'block';
+            loadingProgressText.style.display = 'block';
+            loadingProgressBar.style.width = '0%';
+            messageSuccess.style.display = 'none';
+            messageError.style.display = 'none';
+
+            let data = {};
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            
+            const siteUrlStored = getStorage('wpCollectorUrl');
+            const username = getStorage('wpCollectorUser');
+            const password = getStorage('wpCollectorPass');
+            
+            if (!siteUrlStored || !username || !password) {
+                showError("Your login session has expired. Please log out and log back in.");
+                if(submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = submitButton.dataset.defaultText || 'Submit';
+                }
+                return; 
+            }
+            
+            const siteUrl = siteUrlStored.replace(/\/+$/, '');
+            const basicAuth = 'Basic ' + btoa(username + ':' + password);
+            
+            let totalFiles = 0;
+            let filesUploaded = 0;
+
+            if(submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Creating...';
+            }
+            
+            try {
+                // === Client-side Validation & Data Collection ===
+                if (templateType === 'media-link') {
+                    updateProgress(0, 0, 'Creating post...');
+                    const url = document.getElementById('link-url').value;
+                    const title = document.getElementById('link-title').value;
+                    if (!url || !title) throw new Error('Please fill in both the Link URL and Link Title.');
+                    data = {
+                        template: 'media-link',
+                        url: ensureHttps(url),
+                        title: title,
+                        description: document.getElementById('link-description').value,
+                        postCategory: document.getElementById('link-post-category').value,
+                        year: document.getElementById('link-year').value,
+                        bodyOfWork: document.getElementById('link-body-of-work').value
+                    };
+                } else if (templateType === 'media-video') {
+                    
+                    const title = document.getElementById('video-title').value;
+                    if (!title) throw new Error('Please fill in the Video Title.');
+                    
+                    const videoSource = document.querySelector('input[name="video-source"]:checked').value;
+                    
+                    data = {
+                        template: 'media-video',
+                        title: title,
+                        description: document.getElementById('video-description').value,
+                        postCategory: document.getElementById('video-post-category').value,
+                        year: document.getElementById('video-year').value,
+                        bodyOfWork: document.getElementById('video-body-of-work').value,
+                        videoType: videoSource
+                    };
+
+                    if (videoSource === 'url') {
+                        const url = document.getElementById('video-url').value;
+                        if (!url) throw new Error('Please fill in the Video URL.');
+                        data.url = ensureHttps(url);
+                        updateProgress(0, 0, 'Creating post...');
+                    } else {
+                        const videoFileInput = document.getElementById('video-file-upload');
+                        if (!videoFileInput.files || videoFileInput.files.length === 0) {
+                            throw new Error('Please select a video file to upload.');
+                        }
+                        
+                        totalFiles = 1; 
+                        updateProgress(0, totalFiles, 'Uploading video...');
+                        
+                        const uploaded = await uploadMediaToWordPress(videoFileInput.files[0], siteUrl, basicAuth);
+                        data.videoId = uploaded.id;
+                        filesUploaded = 1;
+                        updateProgress(1, 1, 'Video uploaded. Creating post...');
+                    }
+                    
+                } else if (templateType === 'work' || templateType === 'exhibition') {
+                    
+                    const title = document.getElementById('portfolio-title').value;
+                    if (!title) throw new Error(`Please fill in the ${templateType === 'work' ? 'Work' : 'Exhibition'} Title.`);
+                    
+                    const description = document.getElementById('portfolio-description').value;
+                    const tagsInput = document.getElementById('portfolio-tags').value;
+                    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+                    
+                    const allImagesInput = document.getElementById('portfolio-all-images');
+                    const featuredImageInput = document.getElementById('portfolio-featured-image');
+                    const filesContainer = document.getElementById('portfolio-files-container');
+                    
+                    // UPDATED: Removed hover image logic
+                    if (allImagesInput) totalFiles += allImagesInput.files.length;
+                    if (featuredImageInput) totalFiles += featuredImageInput.files.length;
+                    if (filesContainer) {
+                        filesContainer.querySelectorAll('.flex').forEach(row => {
+                            const fileInput = row.querySelector('.file-input-dynamic');
+                            if (fileInput && fileInput.files.length > 0) {
+                                totalFiles++;
+                            }
+                        });
+                    }
+                    updateProgress(0, totalFiles, 'Starting upload...');
+                    
+                    const allImagesIds = [];
+                    if (allImagesInput && allImagesInput.files.length > 0) {
+                        for (const file of Array.from(allImagesInput.files)) {
+                            const uploaded = await uploadMediaToWordPress(file, siteUrl, basicAuth);
+                            allImagesIds.push(uploaded.id);
+                            updateProgress(++filesUploaded, totalFiles, `Uploading gallery images (${filesUploaded}/${totalFiles})...`);
+                        }
+                    }
+                    
+                    let featuredImageId = null;
+                    if (featuredImageInput && featuredImageInput.files.length > 0) {
+                        const uploaded = await uploadMediaToWordPress(featuredImageInput.files[0], siteUrl, basicAuth);
+                        featuredImageId = uploaded.id;
+                        updateProgress(++filesUploaded, totalFiles, `Uploading featured image (${filesUploaded}/${totalFiles})...`);
+                    }
+                    
+                    // UPDATED: Removed hover image upload logic
+                    
+                    const files = [];
+                    if (filesContainer) {
+                        filesContainer.querySelectorAll('.flex').forEach(row => {
+                            const titleInput = row.querySelector('input[type="text"]');
+                            const fileInput = row.querySelector('.file-input-dynamic');
+                            if (titleInput && fileInput && fileInput.files.length > 0) {
+                                files.push({
+                                    title: titleInput.value || fileInput.files[0].name, 
+                                    file: fileInput.files[0]
+                                });
+                            }
+                        });
+                    }
+                    
+                    const fileData = [];
+                    for (const fileItem of files) {
+                        const uploaded = await uploadMediaToWordPress(fileItem.file, siteUrl, basicAuth);
+                        fileData.push({
+                            title: fileItem.title,
+                            id: uploaded.id,
+                            url: uploaded.source_url
+                        });
+                        updateProgress(++filesUploaded, totalFiles, `Uploading files (${filesUploaded}/${totalFiles})...`);
+                    }
+                    
+                    const linksContainer = document.getElementById('portfolio-links-container');
+                    const links = [];
+                    if (linksContainer) {
+                        linksContainer.querySelectorAll('.flex').forEach(row => {
+                            const titleInput = row.querySelector('input[type="text"]');
+                            const urlInput = row.querySelector('input[type="url"]');
+                            if (titleInput && urlInput && urlInput.value) {
+                                const url = ensureHttps(urlInput.value);
+                                links.push({
+                                    title: titleInput.value || url,
+                                    url: url
+                                });
+                            }
+                        });
+                    }
+                    
+                    data = {
+                        template: templateType,
+                        title: title,
+                        description: description,
+                        tags: tags,
+                        allImages: allImagesIds,
+                        featuredImage: featuredImageId,
+                        // UPDATED: Removed hoverImage
+                        files: fileData,
+                        links: links
+                    };
+                    
+                    if (templateType === 'exhibition') {
+                        data.gallery = document.getElementById('portfolio-gallery').value;
+                        data.startDate = document.getElementById('portfolio-start-date').value;
+                        data.endDate = document.getElementById('portfolio-end-date').value;
+                    }
+                }
+                
+                if (totalFiles > 0 && filesUploaded === totalFiles) {
+                    updateProgress(totalFiles, totalFiles, 'All files uploaded. Creating post...');
+                } else if (totalFiles === 0) {
+                     updateProgress(0, 0, 'Creating post...');
+                }
+                
+                // === API Call ===
+                const apiUrl = `${siteUrl}/wp-json/content-collector/v1/create-post`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': basicAuth
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const contentType = response.headers.get('content-type');
+                let result;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    console.error('Response status:', response.status);
+                    console.error('Response URL:', response.url);
+                    
+                    let errorMsg = `Server returned an error page. Status: ${response.status}.`;
+                    if (text.includes('404')) {
+                        errorMsg += ' The API endpoint was not found. Please ensure the plugin is active and the REST API is enabled.';
+                    } else if (text.length < 500) {
+                        errorMsg += ' Response: ' + text.substring(0, 200);
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                if (!response.ok) {
+                    throw result; // Throw WP error object
+                }
+
+                // === Success! ===
+                loadingProgressContainer.style.display = 'none';
+                loadingProgressText.style.display = 'none';
+                messageError.style.display = 'none';
+                messageSuccess.style.display = 'block';
+                successText.textContent = `Post "${result.post_title}" (ID: ${result.post_id}) has been created as a draft.`;
+                editLink.href = result.edit_link;
+                viewLink.href = result.view_link;
+
+                event.target.reset(); 
+                
+                eraseStorage(autoSaveKey);
+
+                document.querySelectorAll('div[id$="-preview"]').forEach(preview => preview.innerHTML = '');
+                document.querySelectorAll('.custom-file-input-label').forEach(label => label.textContent = 'Choose file... (or drag here)');
+                document.getElementById('portfolio-files-container').innerHTML = '';
+                document.getElementById('portfolio-links-container').innerHTML = '';
+                document.querySelectorAll('p[id$="-title-status"]').forEach(p => p.innerHTML = '');
+                document.getElementById('portfolio-tags-status').innerHTML = ''; // NEW
+                document.querySelector('input[name="video-source"][value="url"]').click();
+
+
+            } catch (error) {
+                // === Error! ===
+                console.error('Error creating post:', error);
+                let errorMessage = 'An unknown error occurred.';
+                
+                if (error && error.message) {
+                    errorMessage = error.message;
+                } else if (error instanceof Error) {
+                    errorMessage = error.message;
+                }
+                
+                if (error.code === 'rest_unauthorized' || errorMessage.includes('Unauthorized') || errorMessage.includes('session has expired')) {
+                    errorMessage = "Your credentials seem to be invalid or expired. Please log out and log back in.";
+                    showLoginScreen(errorMessage);
+                } else {
+                     showError(errorMessage); 
+                }
+            } finally {
+                if(submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = submitButton.dataset.defaultText || 'Submit';
+                }
+            }
+        }
+        
+        // --- Event Listeners for Generate Buttons ---
+        mediaLinkForm.addEventListener('submit', (e) => handleFormSubmit(e, 'media-link'));
+        mediaVideoForm.addEventListener('submit', (e) => handleFormSubmit(e, 'media-video'));
+        portfolioForm.addEventListener('submit', (e) => {
+            const templateType = templateSelect.value; 
+            handleFormSubmit(e, templateType);
+        });
+
+    </script>
+</body>
+</html>
