@@ -232,19 +232,33 @@
 <body class="bg-gray-100 min-h-screen flex">
 
     <!-- Sidebar -->
-    <div id="sidebar" class="w-64 bg-gray-800 text-white p-6 flex-shrink-0">
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white p-6 flex-shrink-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out">
         <h2 class="text-2xl font-bold mb-6 text-white">Collector Menu</h2>
+        <button id="mobile-menu-close" class="absolute top-4 right-4 md:hidden text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
         <nav>
             <a href="#" id="nav-uploader" class="text-base py-2 px-3 rounded-md block">Content Uploader</a>
-            <a href="#" id="nav-updates" class="text-base py-2 px-3 rounded-md block">Update History</a>
+            <a href="#" id="nav-updates" class="text-base py-2 px-3 rounded-md block">Updates</a>
         </nav>
     </div>
     
-    <!-- Main Content Area -->
-    <div class="flex-1 p-6 overflow-auto h-screen">
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden md:hidden"></div>
     
+    <!-- Main Content Area -->
+    <div id="main-content-area" class="flex-1 h-screen overflow-y-auto">
+    
+        <!-- Mobile Header -->
+        <div class="md:hidden sticky top-0 z-10 bg-white p-4 flex items-center shadow-sm">
+            <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <h1 class="text-lg font-bold ml-4" id="mobile-page-title">Content Uploader</h1>
+        </div>
+        
         <!-- Page 1: Uploader -->
-        <div id="uploader-page">
+        <div id="uploader-page" class="p-4 md:p-6">
             <div class="container mx-auto max-w-2xl w-full">
                 <div class="bg-white rounded-lg shadow-2xl p-8 relative">
                     
@@ -560,10 +574,10 @@
         </div> <!-- End Uploader Page -->
     
         <!-- Page 2: Documentation -->
-        <div id="documentation-page" class="hidden">
+        <div id="documentation-page" class="hidden p-4 md:p-6">
             <div class="container mx-auto max-w-2xl w-full">
                 <div class="bg-white rounded-lg shadow-2xl p-8 relative">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3">Update History: 15/11/2025</h1>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3">Updates: 15/11/2025</h1>
                     
                     <p class="mb-4 text-gray-700">Because your website uses the `minimalio` theme, it has two main content types, which the uploader can now create:</p>
                     <ol class="list-decimal list-inside space-y-2 mb-6 bg-gray-50 p-4 rounded-md">
@@ -814,11 +828,22 @@
             const navUpdates = document.getElementById('nav-updates');
             const uploaderPage = document.getElementById('uploader-page');
             const documentationPage = document.getElementById('documentation-page');
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenuCloseButton = document.getElementById('mobile-menu-close');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const mobilePageTitle = document.getElementById('mobile-page-title');
         
             const navLinks = {
-                'uploader': { link: navUploader, page: uploaderPage },
-                'updates': { link: navUpdates, page: documentationPage }
+                'uploader': { link: navUploader, page: uploaderPage, title: 'Content Uploader' },
+                'updates': { link: navUpdates, page: documentationPage, title: 'Updates' }
             };
+            
+            function closeMobileMenu() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
         
             function showPage(pageId) {
                 Object.keys(navLinks).forEach(key => {
@@ -827,12 +852,18 @@
                         item.page.classList.remove('hidden');
                         item.link.classList.add('bg-gray-700', 'text-white');
                         item.link.classList.remove('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
+                        mobilePageTitle.textContent = item.title;
                     } else {
                         item.page.classList.add('hidden');
                         item.link.classList.remove('bg-gray-700', 'text-white');
                         item.link.classList.add('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
                     }
                 });
+                
+                // Close menu on navigation click on mobile
+                if (window.innerWidth < 768) {
+                    closeMobileMenu();
+                }
             }
         
             navUploader.addEventListener('click', (e) => {
@@ -844,10 +875,72 @@
                 e.preventDefault();
                 showPage('updates');
             });
+            
+            mobileMenuButton.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            });
+            
+            mobileMenuCloseButton.addEventListener('click', closeMobileMenu);
+            sidebarOverlay.addEventListener('click', closeMobileMenu);
         
             // Show the uploader by default
             showPage('uploader');
             // --- End of NEW: Sidebar Navigation ---
+            
+            // --- Setup Event Listeners (from original load event) ---
+            // NEW: Setup stateful file handlers
+            setupFeaturedImage();
+            setupVideoFile();
+            setupGallery();
+            
+            // Setup Add/Remove buttons for dynamic rows
+            setupAddRemoveButtons('portfolio');
+
+            // Setup Drag-and-Drop for static inputs
+            document.querySelectorAll('.drop-zone-container').forEach(setupDragAndDrop);
+            
+            setupVideoFormToggle();
+
+            // Add auto-https to static URL fields
+            const urlFields = [
+                document.getElementById('wp-url'),
+                document.getElementById('link-url'),
+                document.getElementById('video-url')
+            ];
+            
+            urlFields.forEach(field => {
+                if (field) {
+                    field.addEventListener('blur', (e) => {
+                        e.target.value = ensureHttps(e.target.value);
+                    });
+                }
+            });
+            
+            // Setup Auto-Save listeners
+            mainAppSection.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], input[type="number"], textarea, select').forEach(el => {
+                const eventType = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
+                el.addEventListener(eventType, saveFormData);
+            });
+            // Also save on radio change
+            document.querySelectorAll('input[type="radio"]').forEach(el => {
+                el.addEventListener('change', saveFormData);
+            });
+            
+            // Setup Duplicate Check listeners (on blur)
+            document.getElementById('link-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.target.value, 'posts', 'link-title-status');
+            });
+            document.getElementById('video-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.target.value, 'posts', 'video-title-status');
+            });
+             document.getElementById('portfolio-title').addEventListener('blur', (e) => {
+                checkDuplicateTitle(e.g.target.value, 'portfolio', 'portfolio-title-status');
+            });
+            
+            document.getElementById('portfolio-tags').addEventListener('input', (e) => {
+                checkPortfolioTags(e.target.value);
+            });
         });
 
         async function fetchCategories() {
@@ -1129,6 +1222,7 @@
         }
         
         function escapeHTML(str) {
+            if (!str) return "";
             return str.replace(/"/g, '&quot;');
         }
         
@@ -1492,61 +1586,7 @@
         }
 
         // === Initialize Event Listeners on Page Load ===
-        window.addEventListener('load', () => {
-            // NEW: Setup stateful file handlers
-            setupFeaturedImage();
-            setupVideoFile();
-            setupGallery();
-            
-            // Setup Add/Remove buttons for dynamic rows
-            setupAddRemoveButtons('portfolio');
-
-            // Setup Drag-and-Drop for static inputs
-            document.querySelectorAll('.drop-zone-container').forEach(setupDragAndDrop);
-            
-            setupVideoFormToggle();
-
-            // Add auto-https to static URL fields
-            const urlFields = [
-                document.getElementById('wp-url'),
-                document.getElementById('link-url'),
-                document.getElementById('video-url')
-            ];
-            
-            urlFields.forEach(field => {
-                if (field) {
-                    field.addEventListener('blur', (e) => {
-                        e.target.value = ensureHttps(e.target.value);
-                    });
-                }
-            });
-            
-            // Setup Auto-Save listeners
-            mainAppSection.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], input[type="number"], textarea, select').forEach(el => {
-                const eventType = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
-                el.addEventListener(eventType, saveFormData);
-            });
-            // Also save on radio change
-            document.querySelectorAll('input[type="radio"]').forEach(el => {
-                el.addEventListener('change', saveFormData);
-            });
-            
-            // Setup Duplicate Check listeners (on blur)
-            document.getElementById('link-title').addEventListener('blur', (e) => {
-                checkDuplicateTitle(e.target.value, 'posts', 'link-title-status');
-            });
-            document.getElementById('video-title').addEventListener('blur', (e) => {
-                checkDuplicateTitle(e.target.value, 'posts', 'video-title-status');
-            });
-             document.getElementById('portfolio-title').addEventListener('blur', (e) => {
-                checkDuplicateTitle(e.g.target.value, 'portfolio', 'portfolio-title-status');
-            });
-            
-            document.getElementById('portfolio-tags').addEventListener('input', (e) => {
-                checkPortfolioTags(e.target.value);
-            });
-        });
-
+        // DELETED window.addEventListener('load', () => { ... })
 
         // --- Event Listener for Template Dropdown ---
         templateSelect.addEventListener('change', (event) => {
