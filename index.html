@@ -229,321 +229,444 @@
 
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gray-100 min-h-screen flex">
 
-    <div class="container mx-auto max-w-2xl w-full">
-        <div class="bg-white rounded-lg shadow-2xl p-8 relative">
-            
-            <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800 mb-6">
-                WordPress Content Collector
-            </h1>
-
-            <!-- WP Details Form (Login Section) -->
-            <div id="login-section" class="space-y-4">
-                
-                <div id="instructions-box" class="instructions hidden">
-                    <h3>How to Get Your Application Password</h3>
-                    <ol class="space-y-1 text-sm text-gray-700">
-                        <li>Log in to your WordPress admin (e.g., <code>yoursite.com/wp-admin</code>).</li>
-                        <li>In the left-hand menu, go to <strong>Users</strong> > <strong>Profile</strong>.</li>
-                        <li>Scroll down to the "<strong>Application Passwords</strong>" section.</li>
-                        <li>In the "New Application Password Name" box, type a name (e.g., "Content Collector") and click "<strong>Add New Application Password</strong>".</li>
-                        <li>WordPress will generate a password like <code>xxxx xxxx xxxx xxxx</code>.</li>
-                        <li><strong>Copy this password</strong> (don't close the page until you do!) and paste it into the "Application Password" field below.</li>
-                    </ol>
-                </div>
-                
-                <div id="manual-login-box" class="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-700">Login to WordPress</h2>
-                    <div class="hidden">
-                        <label for="wp-url" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Site URL</label>
-                        <input type="url" id="wp-url" placeholder="e.g., https://www.your-site.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label for="wp-user" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Username</label>
-                        <input type="text" id="wp-user" placeholder="Your admin username" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label for="wp-pass" class="block text-sm font-medium text-gray-600 mb-1">Your Application Password</label>
-                        <input type="password" id="wp-pass" placeholder="Paste the xxxx xxxx ... password here" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <button id="login-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 text-sm">
-                        Login & Save Credentials
-                    </button>
+    <!-- Sidebar -->
+    <div id="sidebar" class="w-64 bg-gray-800 text-white p-6 flex-shrink-0">
+        <h2 class="text-2xl font-bold mb-6 text-white">Collector Menu</h2>
+        <nav>
+            <a href="#" id="nav-uploader" class="text-base py-2 px-3 rounded-md block">Content Uploader</a>
+            <a href="#" id="nav-updates" class="text-base py-2 px-3 rounded-md block">Update History</a>
+        </nav>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 p-6 overflow-auto h-screen">
+    
+        <!-- Page 1: Uploader -->
+        <div id="uploader-page">
+            <div class="container mx-auto max-w-2xl w-full">
+                <div class="bg-white rounded-lg shadow-2xl p-8 relative">
                     
-                    <div class="flex items-center pt-2 hidden">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
+                    <h1 id="main-title" class="text-3xl font-bold text-center text-gray-800 mb-6">
+                        WordPress Content Collector
+                    </h1>
+        
+                    <!-- WP Details Form (Login Section) -->
+                    <div id="login-section" class="space-y-4">
+                        
+                        <div id="instructions-box" class="instructions hidden">
+                            <h3>How to Get Your Application Password</h3>
+                            <ol class="space-y-1 text-sm text-gray-700">
+                                <li>Log in to your WordPress admin (e.g., <code>yoursite.com/wp-admin</code>).</li>
+                                <li>In the left-hand menu, go to <strong>Users</strong> > <strong>Profile</strong>.</li>
+                                <li>Scroll down to the "<strong>Application Passwords</strong>" section.</li>
+                                <li>In the "New Application Password Name" box, type a name (e.g., "Content Collector") and click "<strong>Add New Application Password</strong>".</li>
+                                <li>WordPress will generate a password like <code>xxxx xxxx xxxx xxxx</code>.</li>
+                                <li><strong>Copy this password</strong> (don't close the page until you do!) and paste it into the "Application Password" field below.</li>
+                            </ol>
+                        </div>
+                        
+                        <div id="manual-login-box" class="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
+                            <h2 class="text-xl font-semibold text-gray-700">Login to WordPress</h2>
+                            <div class="hidden">
+                                <label for="wp-url" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Site URL</label>
+                                <input type="url" id="wp-url" placeholder="e.g., https://www.your-site.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="wp-user" class="block text-sm font-medium text-gray-600 mb-1">Your WordPress Username</label>
+                                <input type="text" id="wp-user" placeholder="Your admin username" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="wp-pass" class="block text-sm font-medium text-gray-600 mb-1">Your Application Password</label>
+                                <input type="password" id="wp-pass" placeholder="Paste the xxxx xxxx ... password here" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <button id="login-button" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300 text-sm">
+                                Login & Save Credentials
+                            </button>
+                            
+                            <div class="flex items-center pt-2 hidden">
+                                <div class="flex-grow border-t border-gray-300"></div>
+                                <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                                <div class="flex-grow border-t border-gray-300"></div>
+                            </div>
+                            
+                            <div>
+                            </div>
+        
+                            <!-- Login Status Feedback -->
+                            <p id="login-status-msg" class="text-xs text-center" style="display: none;"></p>
+                        </div>
+                    
+                        <!-- Centered key-upload div -->
+                        <div class="pt-4 hidden">
+                            <label for="key-upload" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 text-sm text-center cursor-pointer block">
+                                Upload key.txt
+                            </label>
+                            <input type="file" id="key-upload" class="hidden" accept=".txt,text/plain">
+                            <p id="key-upload-help-text" class="text-xs text-gray-500 text-center mt-2">
+                                (A .txt file with URL on line 1, Username on line 2, and Password on line 3)
+                            </p>
+                            <p id="key-upload-msg" class="text-xs text-center mt-2" style="display: none;"></p>
+                        </div>
                     </div>
                     
-                    <div>
-                    </div>
-
-                    <!-- Login Status Feedback -->
-                    <p id="login-status-msg" class="text-xs text-center" style="display: none;"></p>
-                </div>
-            
-                <!-- Centered key-upload div -->
-                <div class="pt-4 hidden">
-                    <label for="key-upload" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 text-sm text-center cursor-pointer block">
-                        Upload key.txt
-                    </label>
-                    <input type="file" id="key-upload" class="hidden" accept=".txt,text/plain">
-                    <p id="key-upload-help-text" class="text-xs text-gray-500 text-center mt-2">
-                        (A .txt file with URL on line 1, Username on line 2, and Password on line 3)
-                    </p>
-                    <p id="key-upload-msg" class="text-xs text-center mt-2" style="display: none;"></p>
+                    <!-- Main Application Section (Hidden by default) -->
+                    <div id="main-app-section" class="hidden">
+                    
+                        <div class="flex justify-between items-center mb-4">
+                            <p class="text-sm text-green-600">
+                                Logged in as: <span id="welcome-user" class="font-medium"></span>
+                            </p>
+                            <button id="logout-button" class="text-sm text-gray-500 hover:text-red-600 hover:underline">Logout</button>
+                        </div>
+        
+                        <!-- Step 1: Template Selection -->
+                        <div class="mb-6">
+                            <label for="template-select" class="block text-lg font-medium text-gray-700 mb-2">
+                                Select a Template
+                            </label>
+                            <select id="template-select" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Please choose an option --</option>
+                                <option value="media-link">Media (Link)</option>
+                                <option value="media-video">Media (Video)</option>
+                                <option value="work" id="option-work">Work</option>
+                                <option value="exhibition" id="option-exhibition">Exhibition</option>
+                            </select>
+                        </div>
+        
+                        <!-- Step 2: Dynamic Forms Container -->
+                        <div id="forms-container">
+                            
+                            <!-- Media (Link) Form -->
+                            <form id="media-link-form" class="form-section hidden-form space-y-4">
+                                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                                    Media (Link) Details
+                                </h2>
+                                
+                                <div>
+                                    <label for="link-url" class="block text-sm font-medium text-gray-600 mb-1">Link URL <span class="text-red-500">*</span></label>
+                                    <input type="url" id="link-url" placeholder="e.g., https://www.example.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="link-title" class="block text-sm font-medium text-gray-600 mb-1">Link Title <span class="text-red-500">*</span></label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" id="link-title" placeholder="e.g., Article about..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                                    </div>
+                                    <p id="link-title-status" class="text-xs mt-1"></p>
+                                </div>
+                                <div>
+                                    <label for="link-callout" class="block text-sm font-medium text-gray-600 mb-1">Link Callout (Optional)</label>
+                                    <select id="link-callout" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
+                                        <option value="">-- Use Title as Link Text --</option>
+                                        <option value="Read here">Read here</option>
+                                        <option value="Watch here">Watch here</option>
+                                        <option value="Listen here">Listen here</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="link-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                                    <textarea id="link-description" rows="3" placeholder="Short description of the link." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                                </div>
+                                <div>
+                                    <label for="link-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
+                                    <select id="link-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
+                                        <option value="">-- Select Category --</option>
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <button type="submit" data-default-text="Create 'Media (Link)' Post" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                                    Create "Media (Link)" Post
+                                </button>
+                            </form>
+        
+                            <!-- Media (Video) Form -->
+                            <form id="media-video-form" class="form-section hidden-form space-y-4">
+                                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                                    Media (Video) Details
+                                </h2>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">Video Source</label>
+                                    <div class="flex gap-4" id="video-source-radios">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="video-source" value="url" class="form-radio" checked>
+                                            <span class="ml-2">URL</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="video-source" value="upload" class="form-radio">
+                                            <span class="ml-2">Upload</span>
+                                        </label>
+                                    </div>
+                                </div>
+        
+                                <div id="video-source-url-group">
+                                    <label for="video-url" class="block text-sm font-medium text-gray-600 mb-1">Video URL (YouTube, Vimeo, etc.) <span id="video-url-required" class="text-red-500">*</span></label>
+                                    <input type="url" id="video-url" placeholder="e.g., https://www.youtube.com/watch?v=..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                </div>
+        
+                                <div id="video-source-upload-group" class="hidden space-y-2">
+                                    <label for="video-file-upload" class="block text-sm font-medium text-gray-600 mb-1">Video File <span id="video-upload-required" class="text-red-500 hidden">*</span></label>
+                                    <div class="flex gap-2 items-center">
+                                        <div class="drop-zone-container">
+                                            <!-- NEW: Removed accept="video/*" to allow all file types if needed, but video/* is safer. Re-adding. -->
+                                            <input type="file" id="video-file-upload" accept="video/*">
+                                        </div>
+                                        <button type="button" id="video-file-upload-clear" class="clear-image-btn">Clear</button>
+                                    </div>
+                                    <div id="video-file-upload-preview" class="mt-2 text-sm text-gray-600 p-2 bg-gray-50 rounded-md border">
+                                        <!-- Preview will be text, e.g., "Selected: my_video.mp4" -->
+                                    </div>
+                                </div>
+        
+                                <div>
+                                    <label for="video-title" class="block text-sm font-medium text-gray-600 mb-1">Video Title <span class="text-red-500">*</span></label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" id="video-title" placeholder="e.g., Interview with..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                                    </div>
+                                    <p id="video-title-status" class="text-xs mt-1"></p>
+                                </div>
+                                <div>
+                                    <label for="video-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                                    <textarea id="video-description" rows="3" placeholder="Short description of the video." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                                </div>
+                                <div>
+                                    <label for="video-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
+                                    <select id="video-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
+                                        <option value="">-- Select Category --</option>
+                                        <!-- Options will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <button type="submit" data-default-text="Create 'Media (Video)' Post" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                                    Create "Media (Video)" Post
+                                </button>
+                            </form>
+                            
+                            <form id="portfolio-form" class="form-section hidden-form space-y-4">
+                                <h2 id="portfolio-form-title" class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+                                    Work Details
+                                </h2>
+                                <div>
+                                    <label for="portfolio-title" class="block text-sm font-medium text-gray-600 mb-1">Title <span class="text-red-500">*</span></label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" id="portfolio-title" placeholder="e.g., My New Sculpture" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
+                                    </div>
+                                    <p id="portfolio-title-status" class="text-xs mt-1"></p>
+                                </div>
+                                <div>
+                                    <label for="portfolio-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                                    <textarea id="portfolio-description" rows="4" placeholder="Description of the work..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
+                                </div>
+                                <div>
+                                    <label for="portfolio-tags" class="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated: year, mediums, bodies of work)</label>
+                                    <input type="text" id="portfolio-tags" placeholder="e.g., 2024, sculpture, bronze, Project Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                    <div id="portfolio-tags-status" class="text-xs mt-1 leading-snug"></div>
+                                </div>
+        
+                                <!-- Exhibition-only fields -->
+                                <div class="exhibition-only hidden">
+                                    <label for="portfolio-gallery" class="block text-sm font-medium text-gray-600 mb-1">Gallery</label>
+                                    <input type="text" id="portfolio-gallery" placeholder="e.g., Gallery Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 exhibition-only hidden">
+                                    <div>
+                                        <label for="portfolio-start-date" class="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
+                                        <input type="date" id="portfolio-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label for="portfolio-end-date" class="block text-sm font-medium text-gray-600 mb-1">End Date</label>
+                                        <input type="date" id="portfolio-end-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="portfolio-featured-image" class="block text-sm font-medium text-gray-600 mb-1">Featured Image</label>
+                                    <div class="flex gap-2 items-center">
+                                        <div class="drop-zone-container">
+                                            <input type="file" id="portfolio-featured-image" accept="image/*">
+                                        </div>
+                                        <button type="button" id="portfolio-featured-image-clear" class="clear-image-btn">Clear</button>
+                                    </div>
+                                    <!-- NEW: Preview div will be populated by JS -->
+                                    <div id="portfolio-featured-image-preview" class="mt-2"></div>
+                                </div>
+                                
+                                <!-- Hover Image field completely REMOVED -->
+        
+                                <div>
+                                    <label for="portfolio-all-images" class="block text-sm font-medium text-gray-600 mb-1">Gallery (multi-select)</label>
+                                    <div class="flex gap-2 items-center">
+                                        <div class="drop-zone-container">
+                                            <input type="file" id="portfolio-all-images" multiple accept="image/*">
+                                        </div>
+                                        <button type="button" id="portfolio-all-images-clear" class="clear-image-btn">Clear All</button>
+                                    </div>
+                                    <!-- NEW: Gallery helper text -->
+                                    <p class="text-xs text-gray-500 mt-1">Add images (you can add more multiple times). Add captions as needed.</p>
+                                    <!-- NEW: Gallery preview grid -->
+                                    <div id="portfolio-all-images-preview" class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                        <!-- Gallery items will be added here by JS -->
+                                    </div>
+                                </div>
+        
+                                <div class="border-t pt-4">
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Files</h3>
+                                    <div id="portfolio-files-container" class="space-y-2">
+                                        <!-- Dynamic rows added here -->
+                                    </div>
+                                    <button type="button" id="portfolio-add-file-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add File</button>
+                                </div>
+                                <div class="border-t pt-4">
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Links</h3>
+                                    <div id="portfolio-links-container" class="space-y-2">
+                                        <!-- Dynamic rows added here -->
+                                    </div>
+                                    <button type="button" id="portfolio-add-link-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Link</button>
+                                </div>
+                                <button type="submit" id="portfolio-submit-button" data-default-text="Create 'Work' Post" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
+                                    Create "Work" Post
+                                </button>
+                            </form>
+        
+                        </div>
+        
+                        <!-- Step 3: Status / Output Section -->
+                        <div id="output-section" class="mt-8 hidden-form">
+        
+                            <div id="loading-progress-container" class="w-full bg-gray-200 rounded-full h-2.5 mb-2" style="display: none;">
+                                <div id="loading-progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p id="loading-progress-text" class="text-center text-sm text-gray-600 mb-4" style="display: none;"></p>
+                            
+                            <div id="message-success" class="message-box success">
+                                <h4>Success! Post Created.</h4>
+                                <p id="success-text"></p>
+                                <p class="mt-2">
+                                    <a id="edit-link" href="#" target="_blank">Edit Draft</a> | 
+                                    <a id="view-link" href="#" target="_blank">Preview Post</a>
+                                </p>
+                            </div>
+                            
+                            <div id="message-error" class="message-box error">
+                                <h4>Error</h4>
+                                <p>There was a problem creating your post.</p>
+                                <pre id="error-text" class="text-xs mt-2 p-2 bg-gray-700 text-red-300 rounded overflow-auto"></pre>
+                            </div>
+                            
+                        </div>
+                    </div> <!-- End Main App Section -->
                 </div>
             </div>
-            
-            <!-- Main Application Section (Hidden by default) -->
-            <div id="main-app-section" class="hidden">
-            
-                <div class="flex justify-between items-center mb-4">
-                    <p class="text-sm text-green-600">
-                        Logged in as: <span id="welcome-user" class="font-medium"></span>
-                    </p>
-                    <button id="logout-button" class="text-sm text-gray-500 hover:text-red-600 hover:underline">Logout</button>
+        </div> <!-- End Uploader Page -->
+    
+        <!-- Page 2: Documentation -->
+        <div id="documentation-page" class="hidden">
+            <div class="container mx-auto max-w-2xl w-full">
+                <div class="bg-white rounded-lg shadow-2xl p-8 relative">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3">Update History: 15/11/2025</h1>
+                    
+                    <p class="mb-4 text-gray-700">Because your website uses the `minimalio` theme, it has two main content types, which the uploader can now create:</p>
+                    <ol class="list-decimal list-inside space-y-2 mb-6 bg-gray-50 p-4 rounded-md">
+                        <li><strong>Posts:</strong> This is for your "Media (Link)" and "Media (Video)" items.</li>
+                        <li><strong>Portfolio:</strong> This is for your "Work" and "Exhibition" items.</li>
+                    </ol>
+                    <p class="mb-6 text-gray-700">This summary explains all the changes and, most importantly, <strong>where to find your new drafts</strong> for each type.</p>
+    
+                    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 mt-6">Part 1: Answers to Your Questions</h2>
+    
+                    <h3 class="text-xl font-semibold text-gray-600 mt-4 mb-2">How to edit a text that is already there?</h3>
+                    <p class="mb-4 text-gray-700">This tool is designed only for <strong>creating new drafts</strong>, not for editing posts that are already on the website.</p>
+                    <p class="mb-4 text-gray-700">To edit any post (whether it's a 'Post' or a 'Portfolio' item), you should use the <strong>"Edit Draft"</strong> link that appears right after you successfully create something. That link will always take you to the correct WordPress editor.</p>
+    
+                    <h3 class="text-xl font-semibold text-gray-600 mt-4 mb-2">I have made many many drafts: how to post them?</h3>
+                    <p class="mb-4 text-gray-700">This is the most important part. Because you have two different types of content, they live in two different places in your WordPress dashboard.</p>
+    
+                    <h4 class="text-lg font-medium text-gray-600 mt-4 mb-2">How to Publish "Media (Link)" or "Media (Video)" drafts:</h4>
+                    <p class="mb-2 text-gray-700">These items are saved as <strong>Posts</strong>.</p>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700 mb-4">
+                        <li>Log in to your WordPress admin.</li>
+                        <li>In the left-hand menu, go to <strong>Posts</strong> &rarr; <strong>All Posts</strong>.</li>
+                        <li>You will see your list of drafts. Find the one you want to publish (e.g., "My Video Interview") and click <strong>"Edit"</strong>.</li>
+                        <li>This opens the standard post editor. In the top-right corner, click the blue <strong>"Publish"</strong> button.</li>
+                    </ol>
+    
+                    <h4 class="text-lg font-medium text-gray-600 mt-4 mb-2">How to Publish "Work" or "Exhibition" drafts:</h4>
+                    <p class="mb-2 text-gray-700">These items are saved as <strong>Portfolio</strong> items.</p>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700 mb-4">
+                        <li>Log in to your WordPress admin.</li>
+                        <li>In the left-hand menu, find the section called <strong>Portfolio</strong> (it may also be "Portfolio Items" or "Projects").</li>
+                        <li>Click on it to see all your portfolio items.</li>
+                        <li>You will see your list of drafts. Find the one you want to publish (e.g., "My New Sculpture") and click <strong>"Edit"</strong>.</li>
+                        <li>This opens the portfolio editor. In the top-right corner, click the blue <strong>"Publish"</strong> button.</li>
+                    </ol>
+    
+                    <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 mt-8">Part 2: Summary of Recent Fixes &amp; New Features</h2>
+                    <ul class="list-disc list-outside space-y-5 pl-6 text-gray-700">
+                        <li>
+                            <strong>Gallery (multi-select) - FIXED!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> You would upload 4 images, then try to add a 5th, and it would delete the first 4.</li>
+                                <li><strong>Solution:</strong> This is now fixed. You can add a batch of images, and then add more, and the new ones will be <strong>added to the list</strong> without replacing the old ones.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Gallery Auto-Fill - DONE!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> After uploading, the gallery in the WordPress draft was empty,
+                                    forcing you to re-add all the images.</li>
+                                <li><strong>Solution:</strong> The uploader now <strong>automatically builds the
+                                    `minimalio` gallery</strong> for you. When you click "Edit Draft," the gallery
+                                    will be fully populated with all the images you uploaded.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Photo Captions - DONE!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> You wanted to add captions.</li>
+                                <li><strong>Solution:</strong> When you add images to the "Gallery (multi-select)" box, you
+                                    will now see a <strong>small text box under each image preview</strong>. Whatever you
+                                    type in there will be saved as that photo's caption.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>"Featured image" disappears - FIXED!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> You would select a Featured Image, but it would disappear while
+                                    you were filling out other fields.</li>
+                                <li><strong>Solution:</strong> This was related to the gallery bug and is now fixed. The
+                                    image you select will "stick" until you click "Clear" or submit the post.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>New "Link Callout" Field - ADDED!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> You wanted the link button on "Media (Link)" posts to say "Read
+                                    here," "Watch here," or "Listen here."</li>
+                                <li><strong>Solution:</strong> I've added a new dropdown menu to the "Media (Link)" form
+                                    called <strong>"Link Callout (Optional)"</strong>. You can pick one of those
+                                    options. If you leave it blank, the button will just use the post's title, like
+                                    it did before.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>"Tags" on the page - REMOVED!</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Problem:</strong> You didn't want the tags (like "Work," "2024," or "sculpture")
+                                    to be visible on the final post.</li>
+                                <li><strong>Solution:</strong> Done. I've removed the code that was printing the tags onto
+                                    the page. The tags are still saved in the background (which is good for
+                                    organization!), but they will no longer appear on the public-facing post.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+    
                 </div>
-
-                <!-- Step 1: Template Selection -->
-                <div class="mb-6">
-                    <label for="template-select" class="block text-lg font-medium text-gray-700 mb-2">
-                        Select a Template
-                    </label>
-                    <select id="template-select" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">-- Please choose an option --</option>
-                        <option value="media-link">Media (Link)</option>
-                        <option value="media-video">Media (Video)</option>
-                        <option value="work" id="option-work">Work</option>
-                        <option value="exhibition" id="option-exhibition">Exhibition</option>
-                    </select>
-                </div>
-
-                <!-- Step 2: Dynamic Forms Container -->
-                <div id="forms-container">
-                    
-                    <!-- Media (Link) Form -->
-                    <form id="media-link-form" class="form-section hidden-form space-y-4">
-                        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
-                            Media (Link) Details
-                        </h2>
-                        
-                        <div>
-                            <label for="link-url" class="block text-sm font-medium text-gray-600 mb-1">Link URL <span class="text-red-500">*</span></label>
-                            <input type="url" id="link-url" placeholder="e.g., https://www.example.com" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
-                        </div>
-                        <div>
-                            <label for="link-title" class="block text-sm font-medium text-gray-600 mb-1">Link Title <span class="text-red-500">*</span></label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="link-title" placeholder="e.g., Article about..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                            <p id="link-title-status" class="text-xs mt-1"></p>
-                        </div>
-                        <div>
-                            <label for="link-callout" class="block text-sm font-medium text-gray-600 mb-1">Link Callout (Optional)</label>
-                            <select id="link-callout" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
-                                <option value="">-- Use Title as Link Text --</option>
-                                <option value="Read here">Read here</option>
-                                <option value="Watch here">Watch here</option>
-                                <option value="Listen here">Listen here</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="link-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                            <textarea id="link-description" rows="3" placeholder="Short description of the link." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
-                        </div>
-                        <div>
-                            <label for="link-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
-                            <select id="link-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
-                                <option value="">-- Select Category --</option>
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
-                        <button type="submit" data-default-text="Create 'Media (Link)' Post" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
-                            Create "Media (Link)" Post
-                        </button>
-                    </form>
-
-                    <!-- Media (Video) Form -->
-                    <form id="media-video-form" class="form-section hidden-form space-y-4">
-                        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
-                            Media (Video) Details
-                        </h2>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Video Source</label>
-                            <div class="flex gap-4" id="video-source-radios">
-                                <label class="flex items-center">
-                                    <input type="radio" name="video-source" value="url" class="form-radio" checked>
-                                    <span class="ml-2">URL</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="video-source" value="upload" class="form-radio">
-                                    <span class="ml-2">Upload</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div id="video-source-url-group">
-                            <label for="video-url" class="block text-sm font-medium text-gray-600 mb-1">Video URL (YouTube, Vimeo, etc.) <span id="video-url-required" class="text-red-500">*</span></label>
-                            <input type="url" id="video-url" placeholder="e.g., https://www.youtube.com/watch?v=..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                        </div>
-
-                        <div id="video-source-upload-group" class="hidden space-y-2">
-                            <label for="video-file-upload" class="block text-sm font-medium text-gray-600 mb-1">Video File <span id="video-upload-required" class="text-red-500 hidden">*</span></label>
-                            <div class="flex gap-2 items-center">
-                                <div class="drop-zone-container">
-                                    <!-- NEW: Removed accept="video/*" to allow all file types if needed, but video/* is safer. Re-adding. -->
-                                    <input type="file" id="video-file-upload" accept="video/*">
-                                </div>
-                                <button type="button" id="video-file-upload-clear" class="clear-image-btn">Clear</button>
-                            </div>
-                            <div id="video-file-upload-preview" class="mt-2 text-sm text-gray-600 p-2 bg-gray-50 rounded-md border">
-                                <!-- Preview will be text, e.g., "Selected: my_video.mp4" -->
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="video-title" class="block text-sm font-medium text-gray-600 mb-1">Video Title <span class="text-red-500">*</span></label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="video-title" placeholder="e.g., Interview with..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                            <p id="video-title-status" class="text-xs mt-1"></p>
-                        </div>
-                        <div>
-                            <label for="video-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                            <textarea id="video-description" rows="3" placeholder="Short description of the video." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
-                        </div>
-                        <div>
-                            <label for="video-post-category" class="block text-sm font-medium text-gray-600 mb-1">Post Category</label>
-                            <select id="video-post-category" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-1 focus:ring-blue-500">
-                                <option value="">-- Select Category --</option>
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
-                        <button type="submit" data-default-text="Create 'Media (Video)' Post" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">
-                            Create "Media (Video)" Post
-                        </button>
-                    </form>
-                    
-                    <form id="portfolio-form" class="form-section hidden-form space-y-4">
-                        <h2 id="portfolio-form-title" class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
-                            Work Details
-                        </h2>
-                        <div>
-                            <label for="portfolio-title" class="block text-sm font-medium text-gray-600 mb-1">Title <span class="text-red-500">*</span></label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="portfolio-title" placeholder="e.g., My New Sculpture" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500" required>
-                            </div>
-                            <p id="portfolio-title-status" class="text-xs mt-1"></p>
-                        </div>
-                        <div>
-                            <label for="portfolio-description" class="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                            <textarea id="portfolio-description" rows="4" placeholder="Description of the work..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"></textarea>
-                        </div>
-                        <div>
-                            <label for="portfolio-tags" class="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated: year, mediums, bodies of work)</label>
-                            <input type="text" id="portfolio-tags" placeholder="e.g., 2024, sculpture, bronze, Project Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                            <div id="portfolio-tags-status" class="text-xs mt-1 leading-snug"></div>
-                        </div>
-
-                        <!-- Exhibition-only fields -->
-                        <div class="exhibition-only hidden">
-                            <label for="portfolio-gallery" class="block text-sm font-medium text-gray-600 mb-1">Gallery</label>
-                            <input type="text" id="portfolio-gallery" placeholder="e.g., Gallery Name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 exhibition-only hidden">
-                            <div>
-                                <label for="portfolio-start-date" class="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
-                                <input type="date" id="portfolio-start-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="portfolio-end-date" class="block text-sm font-medium text-gray-600 mb-1">End Date</label>
-                                <input type="date" id="portfolio-end-date" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label for="portfolio-featured-image" class="block text-sm font-medium text-gray-600 mb-1">Featured Image</label>
-                            <div class="flex gap-2 items-center">
-                                <div class="drop-zone-container">
-                                    <input type="file" id="portfolio-featured-image" accept="image/*">
-                                </div>
-                                <button type="button" id="portfolio-featured-image-clear" class="clear-image-btn">Clear</button>
-                            </div>
-                            <!-- NEW: Preview div will be populated by JS -->
-                            <div id="portfolio-featured-image-preview" class="mt-2"></div>
-                        </div>
-                        
-                        <!-- Hover Image field completely REMOVED -->
-
-                        <div>
-                            <label for="portfolio-all-images" class="block text-sm font-medium text-gray-600 mb-1">Gallery (multi-select)</label>
-                            <div class="flex gap-2 items-center">
-                                <div class="drop-zone-container">
-                                    <input type="file" id="portfolio-all-images" multiple accept="image/*">
-                                </div>
-                                <button type="button" id="portfolio-all-images-clear" class="clear-image-btn">Clear All</button>
-                            </div>
-                            <!-- NEW: Gallery helper text -->
-                            <p class="text-xs text-gray-500 mt-1">Add images (you can add more multiple times). Add captions as needed.</p>
-                            <!-- NEW: Gallery preview grid -->
-                            <div id="portfolio-all-images-preview" class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                <!-- Gallery items will be added here by JS -->
-                            </div>
-                        </div>
-
-                        <div class="border-t pt-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Files</h3>
-                            <div id="portfolio-files-container" class="space-y-2">
-                                <!-- Dynamic rows added here -->
-                            </div>
-                            <button type="button" id="portfolio-add-file-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add File</button>
-                        </div>
-                        <div class="border-t pt-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Optional: Links</h3>
-                            <div id="portfolio-links-container" class="space-y-2">
-                                <!-- Dynamic rows added here -->
-                            </div>
-                            <button type="button" id="portfolio-add-link-btn" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Link</button>
-                        </div>
-                        <button type="submit" id="portfolio-submit-button" data-default-text="Create 'Work' Post" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-300">
-                            Create "Work" Post
-                        </button>
-                    </form>
-
-                </div>
-
-                <!-- Step 3: Status / Output Section -->
-                <div id="output-section" class="mt-8 hidden-form">
-
-                    <div id="loading-progress-container" class="w-full bg-gray-200 rounded-full h-2.5 mb-2" style="display: none;">
-                        <div id="loading-progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                    <p id="loading-progress-text" class="text-center text-sm text-gray-600 mb-4" style="display: none;"></p>
-                    
-                    <div id="message-success" class="message-box success">
-                        <h4>Success! Post Created.</h4>
-                        <p id="success-text"></p>
-                        <p class="mt-2">
-                            <a id="edit-link" href="#" target="_blank">Edit Draft</a> | 
-                            <a id="view-link" href="#" target="_blank">Preview Post</a>
-                        </p>
-                    </div>
-                    
-                    <div id="message-error" class="message-box error">
-                        <h4>Error</h4>
-                        <p>There was a problem creating your post.</p>
-                        <pre id="error-text" class="text-xs mt-2 p-2 bg-gray-700 text-red-300 rounded overflow-auto"></pre>
-                    </div>
-                    
-                </div>
-            </div> <!-- End Main App Section -->
-        </div>
-    </div>
-
+            </div>
+        </div> <!-- End Documentation Page -->
+    
+    </div> <!-- End Main Content Area -->
+    
     <script>
         // === Global State Variables ===
         // NEW: These variables will hold the selected files, decoupled from the input elements.
@@ -685,6 +808,46 @@
             if (storedUser && storedPass) {
                 await fetchCategories();
             }
+            
+            // --- NEW: Sidebar Navigation ---
+            const navUploader = document.getElementById('nav-uploader');
+            const navUpdates = document.getElementById('nav-updates');
+            const uploaderPage = document.getElementById('uploader-page');
+            const documentationPage = document.getElementById('documentation-page');
+        
+            const navLinks = {
+                'uploader': { link: navUploader, page: uploaderPage },
+                'updates': { link: navUpdates, page: documentationPage }
+            };
+        
+            function showPage(pageId) {
+                Object.keys(navLinks).forEach(key => {
+                    const item = navLinks[key];
+                    if (key === pageId) {
+                        item.page.classList.remove('hidden');
+                        item.link.classList.add('bg-gray-700', 'text-white');
+                        item.link.classList.remove('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
+                    } else {
+                        item.page.classList.add('hidden');
+                        item.link.classList.remove('bg-gray-700', 'text-white');
+                        item.link.classList.add('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
+                    }
+                });
+            }
+        
+            navUploader.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('uploader');
+            });
+        
+            navUpdates.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('updates');
+            });
+        
+            // Show the uploader by default
+            showPage('uploader');
+            // --- End of NEW: Sidebar Navigation ---
         });
 
         async function fetchCategories() {
@@ -1096,8 +1259,6 @@
                 videoTitle: document.getElementById('video-title').value,
                 videoDesc: document.getElementById('video-description').value,
                 videoCat: document.getElementById('video-post-category').value,
-                videoYear: document.getElementById('video-year').value,
-                videoBody: document.getElementById('video-body-of-work').value,
                 videoSource: document.querySelector('input[name="video-source"]:checked').value,
                 // Merged portfolio fields
                 portfolioTitle: document.getElementById('portfolio-title').value,
@@ -1148,8 +1309,6 @@
                 document.getElementById('video-title').value = data.videoTitle || '';
                 document.getElementById('video-description').value = data.videoDesc || '';
                 document.getElementById('video-post-category').value = data.videoCat || '';
-                document.getElementById('video-year').value = data.videoYear || '';
-                document.getElementById('video-body-of-work').value = data.videoBody || '';
                 if(data.videoSource) {
                     const radio = document.querySelector(`input[name="video-source"][value="${data.videoSource}"]`);
                     if(radio) radio.click(); 
