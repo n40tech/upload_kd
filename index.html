@@ -345,7 +345,7 @@
                                 <option value="media-link">Media (Link)</option>
                                 <option value="media-video">Media (Video)</option>
                                 <option value="work" id="option-work">Work</option>
-                                <option value="exhibition" id="option-exhibition">Exhibition</option>
+                                <option value="exhibition" id="option-exhibition">Exhibitions</option>
                             </select>
                         </div>
         
@@ -388,6 +388,10 @@
                                         <option value="">-- Select Category --</option>
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
+                                </div>
+                                <!-- NEW: Clarification Note -->
+                                <div class="pt-2">
+                                    <p class="text-xs text-gray-500 italic text-center">Note: Image galleries are only available for 'Work' and 'Exhibitions' templates.</p>
                                 </div>
                                 <button type="submit" data-default-text="Create 'Media (Link)' Post" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
                                     Create "Media (Link)" Post
@@ -450,6 +454,10 @@
                                         <option value="">-- Select Category --</option>
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
+                                </div>
+                                <!-- NEW: Clarification Note -->
+                                <div class="pt-2">
+                                    <p class="text-xs text-gray-500 italic text-center">Note: Image galleries are only available for 'Work' and 'Exhibitions' templates.</p>
                                 </div>
                                 <button type="submit" data-default-text="Create 'Media (Video)' Post" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">
                                     Create "Media (Video)" Post
@@ -577,12 +585,60 @@
         <div id="documentation-page" class="hidden p-4 md:p-6">
             <div class="container mx-auto max-w-2xl w-full">
                 <div class="bg-white rounded-lg shadow-2xl p-8 relative">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3">Updates: 15/11/2025</h1>
+                    
+                    <!-- NEW: Update 17/11/2025 -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3" id="update-17-11-2025">Updates: 17/11/2025</h1>
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">How to Edit and Add to Your Posts</h2>
+                    <p class="mb-4 text-gray-700">Thank you for the great feedback on editing! This guide explains how to add new content (images, links, videos, tags) to a post you have already published.
+                    </p>
+                    <p class="mb-4 text-gray-700">The <strong>Content Collector</strong> is perfect for <strong>creating</strong> your initial draft. For <strong>editing</strong> and adding to a post, the standard WordPress block editor is the safest and most powerful tool.
+                    </p>
+                    <p class="mb-4 text-gray-700">Here’s how to do the specific things you asked for:</p>
+
+                    <h3 class="text-xl font-semibold text-gray-600 mt-6 mb-2">1. How to Add More Images to a Gallery</h3>
+                    <!-- NEW: Clarification Note -->
+                    <p class="mb-4 text-sm text-blue-700 bg-blue-50 p-3 rounded-lg"><strong>Quick Note:</strong> Image galleries are only for <strong>Work</strong> and <strong>Exhibitions</strong> posts. The "Media (Link)" and "Media (Video)" templates do not have galleries.</p>
+                    <ol class="list-decimal list-inside space-y-3 text-gray-700">
+                        <li>Go to your <strong>Portfolio</strong> and click <strong>"Edit"</strong> on the post you want to change.</li>
+                        <li>Click directly on the main image gallery. A small toolbar will appear.</li>
+                        <li>Click the <strong>"Edit Gallery"</strong> button (it might look like a pencil or three dots).</li>
+                        <li>A new window will open. In the bottom-left, you will see a link: <strong>"Add to Gallery"</strong>. Click it.</li>
+                        <li>You can now upload new images or select existing ones from your Media Library.</li>
+                        <li>Once your new images are selected, click the <strong>"Add to Gallery"</strong> button, and then click <strong>"Update Gallery"</strong>.</li>
+                        <li>Finally, click the main blue <strong>"Update"</strong> button for the whole post.</li>
+                    </ol>
+
+                    <h3 class="text-xl font-semibold text-gray-600 mt-6 mb-2">2. How to Add More Links or Videos</h3>
+                    <p class="mb-4 text-gray-700">You can add new blocks for links or videos anywhere on the page.</p>
+                    <ol class="list-decimal list-inside space-y-3 text-gray-700">
+                        <li>In the editor, find a place where you want to add the new link/video and click to put your cursor there.</li>
+                        <li>Click the blue <strong>`+`</strong> icon (or black `+` icon) to "Add block".</li>
+                        <li>
+                            <strong>For Links:</strong> Search for the <strong>"Paragraph"</strong> or <strong>"Button"</strong> block. Type your text, highlight it, and click the link icon in the toolbar to add the URL.
+                        </li>
+                        <li>
+                            <strong>For Videos:</strong> Search for the <strong>"Video"</strong> or <strong>"Embed"</strong> block. You can paste your YouTube/Vimeo URL directly, or upload a video file.
+                        </li>
+                        <li>Click the main blue <strong>"Update"</strong> button for the post.</li>
+                    </ol>
+
+                    <h3 class="text-xl font-semibold text-gray-600 mt-6 mb-2">3. How to Add More Tags</h3>
+                    <p class="mb-4 text-gray-700">This is the easiest one! You don't even have to touch the post content.</p>
+                    <ol class="list-decimal list-inside space-y-3 text-gray-700">
+                        <li>Open the post in the editor.</li>
+                        <li>On the right-hand side, make sure the <strong>"Post"</strong> or <strong>"Portfolio Item"</strong> tab is selected.</li>
+                        <li>Scroll down until you see the <strong>"Tags"</strong> (or <strong>"Portfolio Tags"</strong>) section.</li>
+                        <li>Simply type your new tags into the box (e.g., "2025, new work, London") and press Enter.</li>
+                        <li>Click the main blue <strong>"Update"</strong> button. The new tags will be added.</li>
+                    </ol>
+
+                    <!-- Previous Update -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3 mt-12" id="update-15-11-2025">Updates: 15/11/2025</h1>
                     
                     <p class="mb-4 text-gray-700">Because your website uses the `minimalio` theme, it has two main content types, which the uploader can now create:</p>
                     <ol class="list-decimal list-inside space-y-2 mb-6 bg-gray-50 p-4 rounded-md">
                         <li><strong>Posts:</strong> This is for your "Media (Link)" and "Media (Video)" items.</li>
-                        <li><strong>Portfolio:</strong> This is for your "Work" and "Exhibition" items.</li>
+                        <li><strong>Portfolio:</strong> This is for your "Work" and "Exhibitions" items.</li>
                     </ol>
                     <p class="mb-6 text-gray-700">This summary explains all the changes and, most importantly, <strong>where to find your new drafts</strong> for each type.</p>
     
@@ -604,7 +660,7 @@
                         <li>This opens the standard post editor. In the top-right corner, click the blue <strong>"Publish"</strong> button.</li>
                     </ol>
     
-                    <h4 class="text-lg font-medium text-gray-600 mt-4 mb-2">How to Publish "Work" or "Exhibition" drafts:</h4>
+                    <h4 class="text-lg font-medium text-gray-600 mt-4 mb-2">How to Publish "Work" or "Exhibitions" drafts:</h4>
                     <p class="mb-2 text-gray-700">These items are saved as <strong>Portfolio</strong> items.</p>
                     <ol class="list-decimal list-inside space-y-1 text-gray-700 mb-4">
                         <li>Log in to your WordPress admin.</li>
@@ -617,24 +673,24 @@
                     <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 mt-8">Part 2: Summary of Recent Fixes &amp; New Features</h2>
                     <ul class="list-disc list-outside space-y-5 pl-6 text-gray-700">
                         <li>
-                            <strong>Gallery (multi-select) - FIXED!</strong>
+                            <strong class="text-gray-800">Gallery (multi-select) - FIXED!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> You would upload 4 images, then try to add a 5th, and it would delete the first 4.</li>
                                 <li><strong>Solution:</strong> This is now fixed. You can add a batch of images, and then add more, and the new ones will be <strong>added to the list</strong> without replacing the old ones.</li>
                             </ul>
                         </li>
                         <li>
-                            <strong>Gallery Auto-Fill - DONE!</strong>
+                            <strong class="text-gray-800">Gallery Auto-Fill - DONE!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> After uploading, the gallery in the WordPress draft was empty,
                                     forcing you to re-add all the images.</li>
                                 <li><strong>Solution:</strong> The uploader now <strong>automatically builds the
-                                    `minimalio` gallery</strong> for you. When you click "Edit Draft," the gallery
+                                    <code class="text-sm bg-gray-100 p-1 rounded">minimalio</code> gallery</strong> for you. When you click "Edit Draft," the gallery
                                     will be fully populated with all the images you uploaded.</li>
                             </ul>
                         </li>
                         <li>
-                            <strong>Photo Captions - DONE!</strong>
+                            <strong class="text-gray-800">Photo Captions - DONE!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> You wanted to add captions.</li>
                                 <li><strong>Solution:</strong> When you add images to the "Gallery (multi-select)" box, you
@@ -643,7 +699,7 @@
                             </ul>
                         </li>
                         <li>
-                            <strong>"Featured image" disappears - FIXED!</strong>
+                            <strong class="text-gray-800">"Featured image" disappears - FIXED!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> You would select a Featured Image, but it would disappear while
                                     you were filling out other fields.</li>
@@ -652,7 +708,7 @@
                             </ul>
                         </li>
                         <li>
-                            <strong>New "Link Callout" Field - ADDED!</strong>
+                            <strong class="text-gray-800">New "Link Callout" Field - ADDED!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> You wanted the link button on "Media (Link)" posts to say "Read
                                     here," "Watch here," or "Listen here."</li>
@@ -663,7 +719,7 @@
                             </ul>
                         </li>
                         <li>
-                            <strong>"Tags" on the page - REMOVED!</strong>
+                            <strong class="text-gray-800">"Tags" on the page - REMOVED!</strong>
                             <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
                                 <li><strong>Problem:</strong> You didn't want the tags (like "Work," "2024," or "sculpture")
                                     to be visible on the final post.</li>
@@ -884,8 +940,34 @@
             mobileMenuCloseButton.addEventListener('click', closeMobileMenu);
             sidebarOverlay.addEventListener('click', closeMobileMenu);
         
-            // Show the uploader by default
-            showPage('uploader');
+            // NEW: Anchor Link Handling
+            function handleHashChange() {
+                const hash = window.location.hash;
+                if (!hash) return false; // No hash, do nothing
+
+                const elementId = hash.substring(1);
+                const element = document.getElementById(elementId);
+
+                // Check if the element exists within the documentation page
+                if (element && documentationPage.contains(element)) {
+                    showPage('updates');
+                    // Scroll to the element after a short delay
+                    // (to ensure the page is visible)
+                    setTimeout(() => {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                    return true; // Hash was handled
+                }
+                return false; // Hash was not for updates page
+            }
+
+            // Check for hash on initial load and listen for changes
+            if (!handleHashChange()) {
+                // If no hash was handled, show the uploader by default
+                showPage('uploader');
+            }
+            window.addEventListener('hashchange', handleHashChange);
+            
             // --- End of NEW: Sidebar Navigation ---
             
             // --- Setup Event Listeners (from original load event) ---
@@ -1607,7 +1689,7 @@
                     const formTitle = document.getElementById('portfolio-form-title');
                     const exhibitionFields = document.querySelectorAll('.exhibition-only');
                     
-                    const titleText = selectedValue === 'work' ? 'Work' : 'Exhibition';
+                    const titleText = selectedValue === 'work' ? 'Work' : 'Exhibitions';
                     
                     formTitle.textContent = `${titleText} Details`;
                     submitButton.textContent = `Create '${titleText}' Post`;
@@ -1749,7 +1831,7 @@
                 } else if (templateType === 'work' || templateType === 'exhibition') {
                     
                     const title = document.getElementById('portfolio-title').value;
-                    if (!title) throw new Error(`Please fill in the ${templateType === 'work' ? 'Work' : 'Exhibition'} Title.`);
+                    if (!title) throw new Error(`Please fill in the ${templateType === 'work' ? 'Work' : 'Exhibitions'} Title.`);
                     
                     const description = document.getElementById('portfolio-description').value;
                     const tagsInput = document.getElementById('portfolio-tags').value;
