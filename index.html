@@ -226,6 +226,16 @@
             border-radius: 0.5rem;
             border: 1px solid #e5e7eb;
         }
+        #portfolio-featured-image-preview .caption-input {
+             width: 100%;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
 
     </style>
 </head>
@@ -389,6 +399,11 @@
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
                                 </div>
+                                <!-- UPDATED: Consolidated Tags for Media -->
+                                <div>
+                                    <label for="link-tags" class="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated)</label>
+                                    <input type="text" id="link-tags" placeholder="e.g., 2025, interview, press" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                </div>
                                 <!-- NEW: Clarification Note -->
                                 <div class="pt-2">
                                     <p class="text-xs text-gray-500 italic text-center">Note: Image galleries are only available for 'Work' and 'Exhibitions' templates.</p>
@@ -427,7 +442,6 @@
                                     <label for="video-file-upload" class="block text-sm font-medium text-gray-600 mb-1">Video File <span id="video-upload-required" class="text-red-500 hidden">*</span></label>
                                     <div class="flex gap-2 items-center">
                                         <div class="drop-zone-container">
-                                            <!-- NEW: Removed accept="video/*" to allow all file types if needed, but video/* is safer. Re-adding. -->
                                             <input type="file" id="video-file-upload" accept="video/*">
                                         </div>
                                         <button type="button" id="video-file-upload-clear" class="clear-image-btn">Clear</button>
@@ -454,6 +468,11 @@
                                         <option value="">-- Select Category --</option>
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
+                                </div>
+                                <!-- UPDATED: Consolidated Tags for Media -->
+                                <div>
+                                    <label for="video-tags" class="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated)</label>
+                                    <input type="text" id="video-tags" placeholder="e.g., 2025, interview, press" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
                                 </div>
                                 <!-- NEW: Clarification Note -->
                                 <div class="pt-2">
@@ -513,8 +532,6 @@
                                     <div id="portfolio-featured-image-preview" class="mt-2"></div>
                                 </div>
                                 
-                                <!-- Hover Image field completely REMOVED -->
-        
                                 <div>
                                     <label for="portfolio-all-images" class="block text-sm font-medium text-gray-600 mb-1">Gallery (multi-select)</label>
                                     <div class="flex gap-2 items-center">
@@ -586,8 +603,30 @@
             <div class="container mx-auto max-w-2xl w-full">
                 <div class="bg-white rounded-lg shadow-2xl p-8 relative">
                     
-                    <!-- NEW: Update 17/11/2025 -->
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3" id="update-17-11-2025">Updates: 17/11/2025</h1>
+                     <!-- NEW: Update 18/11/2025 -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3" id="update-18-11-2025">Updates: 18/11/2025</h1>
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">New Improvements</h2>
+                    <p class="mb-4 text-gray-700">Based on your latest request, I have streamlined the tagging process for media posts and added caption support for featured images.</p>
+                    
+                    <ul class="list-disc list-outside space-y-5 pl-6 text-gray-700">
+                        <li>
+                            <strong class="text-gray-800">Simplified Tags for Media:</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>Change:</strong> The separate "Year" and "Body of Work" fields for Media (Link) and Media (Video) posts have been removed.</li>
+                                <li><strong>Improvement:</strong> There is now just one simple <strong>"Tags"</strong> field, exactly like the one in the Work/Exhibitions form. You can just type your tags separated by commas (e.g., "2025, interview, press").</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong class="text-gray-800">Captions for Featured Images:</strong>
+                            <ul class="list-circle list-outside pl-6 mt-2 space-y-1">
+                                <li><strong>New Feature:</strong> When you select a <strong>Featured Image</strong> for a Work or Exhibition, a text box will now appear underneath the preview.</li>
+                                <li><strong>How to use:</strong> Simply type your caption in that box. It will be saved to the image when the post is created.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <!-- Previous Update -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3 mt-12" id="update-17-11-2025">Updates: 17/11/2025</h1>
                     <h2 class="text-2xl font-semibold text-gray-700 mb-4">How to Edit and Add to Your Posts</h2>
                     <p class="mb-4 text-gray-700">Thank you for the great feedback on editing! This guide explains how to add new content (images, links, videos, tags) to a post you have already published.
                     </p>
@@ -739,9 +778,9 @@
     
     <script>
         // === Global State Variables ===
-        // NEW: These variables will hold the selected files, decoupled from the input elements.
-        // This makes the selection persistent even if inputs are cleared or text is typed.
-        let featuredImageFile = null;
+        // NEW: Update variable to store caption state as well
+        // { file: File, caption: '' } or null
+        let featuredImageState = null;
         let videoFile = null;
         let galleryFiles = []; // This will be an array of objects: { id, file, caption }
 
@@ -861,7 +900,7 @@
             e.preventDefault();
             eraseStorage(autoSaveKey);
             // NEW: Clear file state on logout
-            featuredImageFile = null;
+            featuredImageState = null;
             videoFile = null;
             galleryFiles = [];
             showLoginScreen('You have been logged out.', 'success');
@@ -1165,13 +1204,17 @@
 
             input.addEventListener('change', (e) => {
                 if (e.target.files && e.target.files.length > 0) {
-                    featuredImageFile = e.target.files[0];
+                    // UPDATED: Store as state object with caption
+                    featuredImageState = {
+                         file: e.target.files[0],
+                         caption: ''
+                    };
                     renderFeaturedImagePreview();
                 }
             });
             
             clearBtn.addEventListener('click', () => {
-                featuredImageFile = null;
+                featuredImageState = null;
                 input.value = null; // Clear the file input
                 renderFeaturedImagePreview();
             });
@@ -1181,17 +1224,30 @@
             const preview = document.getElementById('portfolio-featured-image-preview');
             preview.innerHTML = '';
             
-            if (featuredImageFile) {
-                if (featuredImageFile.type.startsWith('image/')) {
+            if (featuredImageState) {
+                if (featuredImageState.file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         const img = document.createElement('img');
                         img.src = event.target.result;
+                        
+                        // Create input for caption
+                        const captionInput = document.createElement('input');
+                        captionInput.type = 'text';
+                        captionInput.className = 'caption-input';
+                        captionInput.placeholder = 'Add caption...';
+                        captionInput.value = featuredImageState.caption;
+                        
+                        captionInput.addEventListener('input', (e) => {
+                            if(featuredImageState) featuredImageState.caption = e.target.value;
+                        });
+                        
                         preview.appendChild(img);
+                        preview.appendChild(captionInput);
                     };
-                    reader.readAsDataURL(featuredImageFile);
+                    reader.readAsDataURL(featuredImageState.file);
                 } else {
-                    preview.textContent = `Selected file: ${featuredImageFile.name}`;
+                    preview.textContent = `Selected file: ${featuredImageState.file.name}`;
                 }
             }
         }
@@ -1430,11 +1486,17 @@
                 linkCallout: document.getElementById('link-callout').value,
                 linkDesc: document.getElementById('link-description').value,
                 linkCat: document.getElementById('link-post-category').value,
+                // UPDATED: Save new tags field
+                linkTags: document.getElementById('link-tags').value,
+                
                 // Media (Video)
                 videoUrl: document.getElementById('video-url').value,
                 videoTitle: document.getElementById('video-title').value,
                 videoDesc: document.getElementById('video-description').value,
                 videoCat: document.getElementById('video-post-category').value,
+                // UPDATED: Save new tags field
+                videoTags: document.getElementById('video-tags').value,
+                
                 videoSource: document.querySelector('input[name="video-source"]:checked').value,
                 // Merged portfolio fields
                 portfolioTitle: document.getElementById('portfolio-title').value,
@@ -1445,8 +1507,10 @@
                 portfolioEnd: document.getElementById('portfolio-end-date').value,
                 portfolioLinks: [], 
                 portfolioFiles: [],
-                // NEW: Save file *names* as placeholders. We can't save the files themselves.
-                featuredImageName: featuredImageFile ? featuredImageFile.name : null,
+                // NEW: Save file *names* and caption as placeholders.
+                featuredImageName: featuredImageState ? featuredImageState.file.name : null,
+                featuredImageCaption: featuredImageState ? featuredImageState.caption : null,
+                
                 videoFileName: videoFile ? videoFile.name : null,
                 galleryFileNames: galleryFiles.map(item => ({ name: item.file.name, caption: item.caption }))
             };
@@ -1480,11 +1544,14 @@
                 document.getElementById('link-callout').value = data.linkCallout || '';
                 document.getElementById('link-description').value = data.linkDesc || '';
                 document.getElementById('link-post-category').value = data.linkCat || '';
+                if(data.linkTags) document.getElementById('link-tags').value = data.linkTags;
                 
                 document.getElementById('video-url').value = data.videoUrl || '';
                 document.getElementById('video-title').value = data.videoTitle || '';
                 document.getElementById('video-description').value = data.videoDesc || '';
                 document.getElementById('video-post-category').value = data.videoCat || '';
+                if(data.videoTags) document.getElementById('video-tags').value = data.videoTags;
+                
                 if(data.videoSource) {
                     const radio = document.querySelector(`input[name="video-source"][value="${data.videoSource}"]`);
                     if(radio) radio.click(); 
@@ -1527,11 +1594,12 @@
                     checkPortfolioTags(data.portfolioTags);
                 }
                 
-                // NEW: Restore file placeholders. We can't restore the files, but we can show
-                // that something *was* selected, so it doesn't look like it vanished.
+                // UPDATED: Restore file placeholders with caption info
                 if (data.featuredImageName) {
                     const preview = document.getElementById('portfolio-featured-image-preview');
-                    preview.innerHTML = `<p class="text-sm text-gray-500 p-2 bg-gray-50 rounded-md border">Selected: <strong>${escapeHTML(data.featuredImageName)}</strong><br>(File must be re-selected to submit)</p>`;
+                    // Restore caption if it exists
+                    let captionText = data.featuredImageCaption ? `<br><em>Caption draft: "${escapeHTML(data.featuredImageCaption)}"</em>` : '';
+                    preview.innerHTML = `<p class="text-sm text-gray-500 p-2 bg-gray-50 rounded-md border">Selected: <strong>${escapeHTML(data.featuredImageName)}</strong>${captionText}<br>(File must be re-selected to submit)</p>`;
                 }
                 if (data.videoFileName) {
                     const preview = document.getElementById('video-file-upload-preview');
@@ -1784,6 +1852,11 @@
                     const url = document.getElementById('link-url').value;
                     const title = document.getElementById('link-title').value;
                     if (!url || !title) throw new Error('Please fill in both the Link URL and Link Title.');
+                    
+                    // UPDATED: Grab tags from new input
+                    const tagsInput = document.getElementById('link-tags').value;
+                    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+
                     data = {
                         template: 'media-link',
                         url: ensureHttps(url),
@@ -1791,6 +1864,7 @@
                         linkCallout: document.getElementById('link-callout').value,
                         description: document.getElementById('link-description').value,
                         postCategory: document.getElementById('link-post-category').value,
+                        tags: tags // Send as array
                     };
                 } else if (templateType === 'media-video') {
                     
@@ -1799,12 +1873,17 @@
                     
                     const videoSource = document.querySelector('input[name="video-source"]:checked').value;
                     
+                    // UPDATED: Grab tags from new input
+                    const tagsInput = document.getElementById('video-tags').value;
+                    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+
                     data = {
                         template: 'media-video',
                         title: title,
                         description: document.getElementById('video-description').value,
                         postCategory: document.getElementById('video-post-category').value,
-                        videoType: videoSource
+                        videoType: videoSource,
+                        tags: tags // Send as array
                     };
 
                     if (videoSource === 'url') {
@@ -1840,7 +1919,7 @@
                     const filesContainer = document.getElementById('portfolio-files-container');
                     
                     // NEW: Calculate total files from state variables
-                    if (featuredImageFile) totalFiles++;
+                    if (featuredImageState) totalFiles++;
                     totalFiles += galleryFiles.length;
                     
                     if (filesContainer) {
@@ -1864,10 +1943,11 @@
                         }
                     }
                     
-                    // NEW: Upload from featuredImageFile variable
+                    // NEW: Upload from featuredImageState variable
                     let featuredImageId = null;
-                    if (featuredImageFile) {
-                        const uploaded = await uploadMediaToWordPress(featuredImageFile, siteUrl, basicAuth);
+                    if (featuredImageState) {
+                        // UPDATED: Pass the caption
+                        const uploaded = await uploadMediaToWordPress(featuredImageState.file, siteUrl, basicAuth, featuredImageState.caption);
                         featuredImageId = uploaded.id;
                         updateProgress(++filesUploaded, totalFiles, `Uploading featured image (${filesUploaded}/${totalFiles})...`);
                     }
@@ -1988,7 +2068,7 @@
                 eraseStorage(autoSaveKey);
 
                 // NEW: Clear state variables and render empty previews
-                featuredImageFile = null;
+                featuredImageState = null;
                 videoFile = null;
                 galleryFiles = [];
                 renderFeaturedImagePreview();
